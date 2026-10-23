@@ -123,6 +123,20 @@ docker compose up --build
 
 ---
 
+### Option C: 1-Click Deployment to Vercel (Fullstack Monorepo)
+
+Both the React (Vite) frontend and Python (FastAPI) backend are unified in this repository for native Vercel deployment:
+
+1. Import this repository into **[Vercel](https://vercel.com/new)** (`https://github.com/invinciblekingg/Nivaar-AI`).
+2. Leave all settings at default (**`vercel.json`** handles build commands, static Vite routing, and `@vercel/python` serverless API dispatch automatically).
+3. Click **Deploy**.
+   - **Frontend SPA**: Served globally from high-speed edge CDN (`/`).
+   - **Backend API**: Dispatched to serverless Python functions (`/api/*`).
+   - **Interactive API Docs**: Available at `/docs`.
+
+---
+
+
 ## 6. Running Automated Tests & Verification
 
 Verify CSV loading, Isolation Forest anomaly computation, API contracts, job deduplication, and worker recovery:

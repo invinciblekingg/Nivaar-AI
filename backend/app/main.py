@@ -32,10 +32,13 @@ logger = logging.getLogger("machineguard.main")
 async def lifespan(app: FastAPI):
     # Startup: Ensure tables exist, seed demo datasets, initialize worker fleet
     logger.info("Initializing Nivaar AI Platform...")
-    Base.metadata.create_all(bind=engine)
-    seed_database()
-    fleet_supervisor.initialize_fleet()
-    logger.info("Nivaar AI Engine and Distributed Worker Fleet online.")
+    try:
+        Base.metadata.create_all(bind=engine)
+        seed_database()
+        fleet_supervisor.initialize_fleet()
+        logger.info("Nivaar AI Engine and Distributed Worker Fleet online.")
+    except Exception as e:
+        logger.warning(f"Startup initialization notice: {e}")
     yield
     # Shutdown
     logger.info("Shutting down Nivaar AI services...")
@@ -44,7 +47,9 @@ app = FastAPI(
     title="Nivaar AI",
     version=settings.VERSION,
     description="Nivaar AI: Intelligent Distributed Predictive Maintenance Platform",
-    lifespan=lifespan
+    lifespan=lifespan,
+    docs_url="/docs",
+    openapi_url="/openapi.json"
 )
 
 # CORS
@@ -70,8 +75,18 @@ app.include_router(vision_router, prefix=settings.API_PREFIX)
 app.include_router(symbiosis_router, prefix=settings.API_PREFIX)
 app.include_router(symbiosis_marketplace_router, prefix=settings.API_PREFIX)
 
+@app.get("/api")
+@app.get("/api/")
+def api_root():
+    return {
+        "service": settings.PROJECT_NAME,
+        "status": "operational",
+        "health": "/api/health",
+        "docs": "/docs"
+    }
 
 @app.get("/api/health")
+@app.get("/health")
 def health_check():
     return {
         "status": "healthy",
@@ -80,6 +95,7 @@ def health_check():
         "database": "connected",
         "distributed_workers": fleet_supervisor.get_status_summary()["active_workers_count"]
     }
+
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
