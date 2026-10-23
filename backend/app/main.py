@@ -1,8 +1,10 @@
 import logging
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pathlib import Path
 
 from backend.app.config import settings
 from backend.app.database import engine, Base
@@ -131,3 +133,45 @@ async def websocket_endpoint(websocket: WebSocket):
         ws_manager.disconnect(websocket)
     except Exception as e:
         ws_manager.disconnect(websocket)
+
+
+# -----------------------------------------------------------------------------
+# Static Files & SPA Fallback (Enables Render, Docker, and Production Deployments)
+# -----------------------------------------------------------------------------
+STATIC_CANDIDATES = [
+    Path(__file__).resolve().parent.parent.parent / "frontend" / "dist",
+    Path(__file__).resolve().parent.parent.parent / "dist",
+]
+
+STATIC_DIR = None
+for candidate in STATIC_CANDIDATES:
+    if candidate.exists() and (candidate / "index.html").exists():
+        STATIC_DIR = candidate
+        break
+
+if STATIC_DIR:
+    logger.info(f"Mounting production frontend distribution from {STATIC_DIR}")
+    assets_dir = STATIC_DIR / "assets"
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="frontend-assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_spa_frontend(full_path: str):
+        # Do not intercept API, websocket, or interactive docs endpoints
+        if (
+            full_path.startswith("api")
+            or full_path.startswith("ws")
+            or full_path in ["docs", "openapi.json", "redoc"]
+        ):
+            raise HTTPException(status_code=404, detail="Endpoint not found")
+
+        # Specific static file request (e.g. /favicon.svg, /nivaar_logo.jpg)
+        target_file = STATIC_DIR / full_path
+        if full_path and target_file.exists() and target_file.is_file():
+            return FileResponse(target_file)
+
+        # React client-side route fallback
+        index_file = STATIC_DIR / "index.html"
+        if index_file.exists():
+            return FileResponse(index_file)
+        raise HTTPException(status_code=404, detail="Frontend index.html not found")
