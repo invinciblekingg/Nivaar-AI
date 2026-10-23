@@ -252,9 +252,14 @@ def execute_job_analysis(job_id: str, worker_id: str = "worker_default") -> dict
         db.close()
 
 
-@celery_app.task(bind=True, max_retries=3)
-def analyze_dataset_celery(self, job_id: str, worker_id: str = "celery_worker"):
-    try:
+if celery_app is not None:
+    @celery_app.task(bind=True, max_retries=3)
+    def analyze_dataset_celery(self, job_id: str, worker_id: str = "celery_worker"):
+        try:
+            return execute_job_analysis(job_id, worker_id)
+        except Exception as exc:
+            raise self.retry(exc=exc, countdown=5)
+else:
+    def analyze_dataset_celery(job_id: str, worker_id: str = "celery_worker"):
         return execute_job_analysis(job_id, worker_id)
-    except Exception as exc:
-        raise self.retry(exc=exc, countdown=5)
+

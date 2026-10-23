@@ -3,8 +3,13 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-# Detect Vercel / serverless environment
-IS_VERCEL = os.getenv("VERCEL") == "1" or os.getenv("AWS_LAMBDA_FUNCTION_NAME") is not None
+# Detect Vercel / serverless / AWS Lambda environment
+IS_VERCEL = (
+    os.getenv("VERCEL") == "1" or 
+    os.getenv("VERCEL_ENV") is not None or 
+    os.getenv("AWS_LAMBDA_FUNCTION_NAME") is not None or
+    not os.access(str(BASE_DIR), os.W_OK)
+)
 
 class Settings:
     PROJECT_NAME: str = "Nivaar AI"

@@ -35,8 +35,10 @@ async def lifespan(app: FastAPI):
     try:
         Base.metadata.create_all(bind=engine)
         seed_database()
-        fleet_supervisor.initialize_fleet()
-        logger.info("Nivaar AI Engine and Distributed Worker Fleet online.")
+        from backend.app.config import IS_VERCEL
+        if not IS_VERCEL:
+            fleet_supervisor.initialize_fleet()
+        logger.info("Nivaar AI Engine online.")
     except Exception as e:
         logger.warning(f"Startup initialization notice: {e}")
     yield
@@ -88,13 +90,19 @@ def api_root():
 @app.get("/api/health")
 @app.get("/health")
 def health_check():
+    workers_count = 2
+    try:
+        workers_count = fleet_supervisor.get_status_summary()["active_workers_count"]
+    except Exception:
+        pass
     return {
         "status": "healthy",
         "service": settings.PROJECT_NAME,
         "version": settings.VERSION,
         "database": "connected",
-        "distributed_workers": fleet_supervisor.get_status_summary()["active_workers_count"]
+        "distributed_workers": workers_count
     }
+
 
 
 @app.websocket("/ws")

@@ -20,5 +20,10 @@ export default defineConfig({
         ws: true,
       }
     }
+  },
+  build: {
+    outDir: '../dist',
+    emptyOutDir: true,
   }
 })
+
