@@ -1,0 +1,308 @@
+[
+  {
+    "filename": "crack_01_hairline.jpg",
+    "category": "crack",
+    "expected_defect": "Structural Crack",
+    "expected_severity": "CRITICAL",
+    "has_defect": true,
+    "bbox_gt": [
+      215,
+      95,
+      305,
+      445
+    ],
+    "description": "Fine hairline structural fracture with micro-branching on bearing raceway."
+  },
+  {
+    "filename": "crack_02_diagonal_fissure.jpg",
+    "category": "crack",
+    "expected_defect": "Structural Crack",
+    "expected_severity": "CRITICAL",
+    "has_defect": true,
+    "bbox_gt": [
+      155,
+      125,
+      385,
+      445
+    ],
+    "description": "Severe diagonal surface fissure under cyclic rotational stress."
+  },
+  {
+    "filename": "crack_03_branching_fatigue.jpg",
+    "category": "crack",
+    "expected_defect": "Structural Crack",
+    "expected_severity": "CRITICAL",
+    "has_defect": true,
+    "bbox_gt": [
+      200,
+      115,
+      435,
+      425
+    ],
+    "description": "Multi-branch fatigue fracture network radiating from central stress riser."
+  },
+  {
+    "filename": "crack_04_transverse_shaft.jpg",
+    "category": "crack",
+    "expected_defect": "Structural Crack",
+    "expected_severity": "CRITICAL",
+    "has_defect": true,
+    "bbox_gt": [
+      125,
+      235,
+      515,
+      265
+    ],
+    "description": "Transverse circumferential crack traversing shaft perimeter."
+  },
+  {
+    "filename": "crack_05_longitudinal_raceway.jpg",
+    "category": "crack",
+    "expected_defect": "Structural Crack",
+    "expected_severity": "CRITICAL",
+    "has_defect": true,
+    "bbox_gt": [
+      320,
+      75,
+      345,
+      465
+    ],
+    "description": "Longitudinal raceway fissure parallel to rotational axis."
+  },
+  {
+    "filename": "crack_06_textured_weld.jpg",
+    "category": "crack",
+    "expected_defect": "Structural Crack",
+    "expected_severity": "CRITICAL",
+    "has_defect": true,
+    "bbox_gt": [
+      185,
+      175,
+      435,
+      415
+    ],
+    "description": "High-contrast weld toe crack in rough cast structural steel."
+  },
+  {
+    "filename": "corrosion_01_severe_patch.jpg",
+    "category": "corrosion",
+    "expected_defect": "Pitting Corrosion",
+    "expected_severity": "SEVERE",
+    "has_defect": true,
+    "bbox_gt": [
+      185,
+      145,
+      485,
+      345
+    ],
+    "description": "Severe iron-oxide oxidation rust patches on pump casing."
+  },
+  {
+    "filename": "corrosion_02_deep_pitting.jpg",
+    "category": "corrosion",
+    "expected_defect": "Pitting Corrosion",
+    "expected_severity": "SEVERE",
+    "has_defect": true,
+    "bbox_gt": [
+      245,
+      190,
+      365,
+      295
+    ],
+    "description": "Dense micro-pitting clusters with active rust bleeding."
+  },
+  {
+    "filename": "corrosion_03_galvanic_band.jpg",
+    "category": "corrosion",
+    "expected_defect": "Pitting Corrosion",
+    "expected_severity": "SEVERE",
+    "has_defect": true,
+    "bbox_gt": [
+      140,
+      215,
+      520,
+      295
+    ],
+    "description": "Galvanic corrosion band along dissimilar metal gasket boundary."
+  },
+  {
+    "filename": "corrosion_04_cavitation_rust.jpg",
+    "category": "corrosion",
+    "expected_defect": "Pitting Corrosion",
+    "expected_severity": "SEVERE",
+    "has_defect": true,
+    "bbox_gt": [
+      220,
+      175,
+      420,
+      305
+    ],
+    "description": "Hydrodynamic cavitation pitting with heavy iron-oxide staining."
+  },
+  {
+    "filename": "corrosion_05_acid_oxidation.jpg",
+    "category": "corrosion",
+    "expected_defect": "Pitting Corrosion",
+    "expected_severity": "SEVERE",
+    "has_defect": true,
+    "bbox_gt": [
+      230,
+      140,
+      450,
+      360
+    ],
+    "description": "Chemical vapor oxidation pit on cast housing surface."
+  },
+  {
+    "filename": "corrosion_06_crevice_rust.jpg",
+    "category": "corrosion",
+    "expected_defect": "Pitting Corrosion",
+    "expected_severity": "SEVERE",
+    "has_defect": true,
+    "bbox_gt": [
+      170,
+      180,
+      350,
+      280
+    ],
+    "description": "Localized crevice rust along flange seating interface."
+  },
+  {
+    "filename": "spalling_01_flaking_craters.jpg",
+    "category": "wear_spalling",
+    "expected_defect": "Wear Spalling",
+    "expected_severity": "MODERATE",
+    "has_defect": true,
+    "bbox_gt": [
+      195,
+      170,
+      425,
+      275
+    ],
+    "description": "Material fatigue flaking craters and micro-spalling on drive flange."
+  },
+  {
+    "filename": "spalling_02_raceway_track.jpg",
+    "category": "wear_spalling",
+    "expected_defect": "Wear Spalling",
+    "expected_severity": "MODERATE",
+    "has_defect": true,
+    "bbox_gt": [
+      215,
+      230,
+      405,
+      275
+    ],
+    "description": "Subsurface shear spall track along rolling contact path."
+  },
+  {
+    "filename": "spalling_03_roller_indentation.jpg",
+    "category": "wear_spalling",
+    "expected_defect": "Wear Spalling",
+    "expected_severity": "MODERATE",
+    "has_defect": true,
+    "bbox_gt": [
+      250,
+      165,
+      380,
+      310
+    ],
+    "description": "Heavy debris-dented spalling craters on load bearing raceway."
+  },
+  {
+    "filename": "spalling_04_delamination.jpg",
+    "category": "wear_spalling",
+    "expected_defect": "Wear Spalling",
+    "expected_severity": "MODERATE",
+    "has_defect": true,
+    "bbox_gt": [
+      225,
+      195,
+      375,
+      240
+    ],
+    "description": "Superficial material delamination flaking under tangential sliding friction."
+  },
+  {
+    "filename": "spalling_05_ball_spall.jpg",
+    "category": "wear_spalling",
+    "expected_defect": "Wear Spalling",
+    "expected_severity": "MODERATE",
+    "has_defect": true,
+    "bbox_gt": [
+      275,
+      225,
+      345,
+      295
+    ],
+    "description": "Focal contact fatigue spall on rolling element."
+  },
+  {
+    "filename": "spalling_06_chatter_wear.jpg",
+    "category": "wear_spalling",
+    "expected_defect": "Wear Spalling",
+    "expected_severity": "MODERATE",
+    "has_defect": true,
+    "bbox_gt": [
+      205,
+      215,
+      435,
+      255
+    ],
+    "description": "Chatter vibration micro-pitting craters across mounting face."
+  },
+  {
+    "filename": "healthy_01_mirror_raceway.jpg",
+    "category": "healthy",
+    "expected_defect": "None",
+    "expected_severity": "NEGLIGIBLE",
+    "has_defect": false,
+    "bbox_gt": [],
+    "description": "Nominal mirror-finish bearing raceway with zero surface defects."
+  },
+  {
+    "filename": "healthy_02_machined_flange.jpg",
+    "category": "healthy",
+    "expected_defect": "None",
+    "expected_severity": "NEGLIGIBLE",
+    "has_defect": false,
+    "bbox_gt": [],
+    "description": "Precision lathe-turned mounting face with standard Ra 1.6 finish."
+  },
+  {
+    "filename": "healthy_03_brushed_casing.jpg",
+    "category": "healthy",
+    "expected_defect": "None",
+    "expected_severity": "NEGLIGIBLE",
+    "has_defect": false,
+    "bbox_gt": [],
+    "description": "Nominal brushed aluminium housing with uniform linear texture."
+  },
+  {
+    "filename": "healthy_04_ground_shaft.jpg",
+    "category": "healthy",
+    "expected_defect": "None",
+    "expected_severity": "NEGLIGIBLE",
+    "has_defect": false,
+    "bbox_gt": [],
+    "description": "Nominal centerless-ground shaft journal with nominal tolerances."
+  },
+  {
+    "filename": "healthy_05_coated_volute.jpg",
+    "category": "healthy",
+    "expected_defect": "None",
+    "expected_severity": "NEGLIGIBLE",
+    "has_defect": false,
+    "bbox_gt": [],
+    "description": "Pristine industrial epoxy barrier coating with zero rust breakthrough."
+  },
+  {
+    "filename": "healthy_06_clean_roller.jpg",
+    "category": "healthy",
+    "expected_defect": "None",
+    "expected_severity": "NEGLIGIBLE",
+    "has_defect": false,
+    "bbox_gt": [],
+    "description": "Factory-new cylindrical roller element with perfect microgeometry."
+  }
+]
