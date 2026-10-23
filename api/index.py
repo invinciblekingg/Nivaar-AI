@@ -18,7 +18,18 @@ os.environ["VERCEL"] = "1"
 logger = logging.getLogger("vercel.entrypoint")
 
 try:
+    from backend.app.database import engine, Base
+    from backend.app.seed_data import seed_database
     from backend.app.main import app
+
+    # Guarantee database tables and initial machine seeds are created on cold start
+    try:
+        Base.metadata.create_all(bind=engine)
+        seed_database()
+        logger.info("Database and seed data successfully initialized for serverless runtime.")
+    except Exception as db_err:
+        logger.warning(f"Serverless DB cold-start notice: {db_err}")
+
 except Exception as e:
     logger.exception(f"Error loading FastAPI app in Vercel: {e}")
     from fastapi import FastAPI

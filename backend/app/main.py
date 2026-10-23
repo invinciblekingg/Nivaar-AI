@@ -63,6 +63,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+_serverless_db_ready = False
+
+@app.middleware("http")
+async def ensure_serverless_db_ready(request, call_next):
+    global _serverless_db_ready
+    if not _serverless_db_ready:
+        try:
+            Base.metadata.create_all(bind=engine)
+            seed_database()
+            _serverless_db_ready = True
+        except Exception as err:
+            logger.warning(f"Serverless DB middleware init: {err}")
+    return await call_next(request)
+
+
 # Register Routers (with and without prefix so serverless rewrites never fail)
 ALL_ROUTERS = [
     machines_router, telemetry_router, diagnostics_router,
