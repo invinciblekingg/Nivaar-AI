@@ -63,19 +63,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register Routers
-app.include_router(machines_router, prefix=settings.API_PREFIX)
-app.include_router(telemetry_router, prefix=settings.API_PREFIX)
-app.include_router(diagnostics_router, prefix=settings.API_PREFIX)
-app.include_router(distributed_router, prefix=settings.API_PREFIX)
-app.include_router(maintenance_router, prefix=settings.API_PREFIX)
-app.include_router(incidents_router, prefix=settings.API_PREFIX)
-app.include_router(reports_router, prefix=settings.API_PREFIX)
-app.include_router(demo_router, prefix=settings.API_PREFIX)
-app.include_router(teng_router, prefix=settings.API_PREFIX)
-app.include_router(vision_router, prefix=settings.API_PREFIX)
-app.include_router(symbiosis_router, prefix=settings.API_PREFIX)
-app.include_router(symbiosis_marketplace_router, prefix=settings.API_PREFIX)
+# Register Routers (with and without prefix so serverless rewrites never fail)
+ALL_ROUTERS = [
+    machines_router, telemetry_router, diagnostics_router,
+    distributed_router, maintenance_router, incidents_router,
+    reports_router, demo_router, teng_router, vision_router,
+    symbiosis_router, symbiosis_marketplace_router
+]
+for r in ALL_ROUTERS:
+    app.include_router(r, prefix=settings.API_PREFIX)
+    app.include_router(r)
+
 
 @app.get("/api")
 @app.get("/api/")
