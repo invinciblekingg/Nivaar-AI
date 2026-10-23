@@ -26,6 +26,25 @@ export function App() {
   const [isDemoModalOpen, setIsDemoModalOpen] = useState<boolean>(false);
   const [isDemoRunning, setIsDemoRunning] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean>(false);
+
+  const handleToggleMenu = () => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+      setSidebarCollapsed(prev => !prev);
+    } else {
+      setMobileMenuOpen(prev => !prev);
+    }
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const fetchGlobalData = async () => {
     try {
@@ -111,7 +130,7 @@ export function App() {
         onLaunchDemo={handleLaunchDemo}
         isDemoRunning={isDemoRunning}
         isMobileMenuOpen={mobileMenuOpen}
-        onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)}
+        onToggleMobileMenu={handleToggleMenu}
       />
 
       <div className="flex-1 flex overflow-hidden">
@@ -125,6 +144,7 @@ export function App() {
           openIncidentsCount={stats?.open_incidents || 1}
           isMobileOpen={mobileMenuOpen}
           onCloseMobile={() => setMobileMenuOpen(false)}
+          isCollapsed={sidebarCollapsed}
         />
 
         {/* Primary Page Canvas */}

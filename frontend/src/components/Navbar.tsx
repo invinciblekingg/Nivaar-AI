@@ -24,12 +24,13 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="h-16 border-b border-[rgba(255,255,255,0.08)] bg-[#14171D] sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between">
       {/* Brand & Mobile Hamburger Toggle */}
       <div className="flex items-center space-x-3">
-        {/* Mobile Navigation Drawer Trigger (Apple HIG Compact Viewport) */}
+        {/* Navigation Drawer / Sidebar Toggle */}
         {onToggleMobileMenu && (
           <button
             onClick={onToggleMobileMenu}
-            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            className="lg:hidden p-2 rounded-xl text-slate-300 hover:text-white bg-[#1B1F27] border border-white/10 hover:border-[#FF5E1E]/50 touch-target-min transition-colors"
+            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Toggle navigation menu"}
+            className="p-2 rounded-xl text-slate-300 hover:text-white bg-[#1B1F27] border border-white/10 hover:border-[#FF5E1E]/50 touch-target-min transition-all cursor-pointer flex items-center justify-center shadow-sm active:scale-95"
+            title="Toggle Menu"
           >
             {isMobileMenuOpen ? (
               <X className="w-5 h-5 text-[#FF7A00]" />
