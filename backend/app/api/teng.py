@@ -8,6 +8,7 @@ from typing import List, Optional, Dict, Any
 from backend.app.database import get_db
 from backend.app.config import settings
 from backend.app.models import Machine, TengReading, TengDataset
+from backend.app.supabase_client import upload_file_to_supabase, sync_record_to_supabase
 from ml.teng_analyzer import TengAnalyzer
 
 router = APIRouter(prefix="/teng", tags=["TENG Sensor Monitoring"])
@@ -102,6 +103,7 @@ def get_teng_telemetry(machine_id: str, db: Session = Depends(get_db)):
         "fault_flags": analysis["fault_flags"],
         "telemetry_stream": analysis["telemetry_stream"],
         "readings": analysis["telemetry_stream"],
+        "trained_model_prediction": analysis.get("trained_model_prediction"),
         "anomalies": analysis["anomalies"]
     }
 
@@ -152,16 +154,56 @@ async def upload_teng_csv(
         db.commit()
         db.refresh(teng_ds)
 
+        # Upload TENG CSV dataset to Supabase Storage and sync to Supabase table
+        storage_url = None
+        try:
+            with open(target_path, "rb") as f_teng:
+                teng_bytes = f_teng.read()
+            storage_url = upload_file_to_supabase(
+                bucket_name=settings.SUPABASE_BUCKET_DATASETS,
+                remote_path=f"teng/{file_id}",
+                file_bytes=teng_bytes,
+                content_type="text/csv"
+            )
+            sync_record_to_supabase("teng_datasets", {
+                "id": teng_ds.id,
+                "machine_id": machine_id,
+                "filename": file.filename,
+                "file_path": str(target_path),
+                "storage_url": storage_url,
+                "row_count": len(df),
+                "summary_metrics": analysis["summary_metrics"],
+                "health_index": analysis["health_index"],
+                "max_anomaly_score": analysis["max_anomaly_score"],
+                "fault_flags": analysis["fault_flags"],
+                "created_at": teng_ds.created_at
+            })
+            sync_record_to_supabase("machines", {
+                "id": machine.id,
+                "name": machine.name,
+                "category": machine.category,
+                "asset_tag": machine.asset_tag,
+                "location_label": machine.location_label,
+                "status": machine.status,
+                "health_index": machine.health_index,
+                "is_monitored": machine.is_monitored,
+                "last_analyzed_at": datetime.utcnow()
+            })
+        except Exception:
+            pass
+
         return {
             "status": "success",
             "dataset_id": teng_ds.id,
             "filename": file.filename,
+            "storage_url": storage_url,
             "row_count": len(df),
             "sample_count": len(df),
             "health_index": analysis["health_index"],
             "max_anomaly_score": analysis.get("max_anomaly_score", 0.0),
             "summary_metrics": analysis["summary_metrics"],
             "fault_flags": analysis["fault_flags"],
+            "trained_model_prediction": analysis.get("trained_model_prediction"),
             "readings": analysis["telemetry_stream"]
         }
     except Exception as e:
@@ -223,6 +265,33 @@ def analyze_benchmark(
     db.commit()
     db.refresh(teng_ds)
 
+    try:
+        sync_record_to_supabase("teng_datasets", {
+            "id": teng_ds.id,
+            "machine_id": target_machine_id,
+            "filename": target_b_file,
+            "file_path": str(target_path),
+            "row_count": len(df),
+            "summary_metrics": analysis["summary_metrics"],
+            "health_index": analysis["health_index"],
+            "max_anomaly_score": analysis["max_anomaly_score"],
+            "fault_flags": analysis["fault_flags"],
+            "created_at": teng_ds.created_at
+        })
+        sync_record_to_supabase("machines", {
+            "id": machine.id,
+            "name": machine.name,
+            "category": machine.category,
+            "asset_tag": machine.asset_tag,
+            "location_label": machine.location_label,
+            "status": machine.status,
+            "health_index": machine.health_index,
+            "is_monitored": machine.is_monitored,
+            "last_analyzed_at": datetime.utcnow()
+        })
+    except Exception:
+        pass
+
     return {
         "status": "success",
         "dataset_id": teng_ds.id,
@@ -232,5 +301,6 @@ def analyze_benchmark(
         "max_anomaly_score": analysis.get("max_anomaly_score", 0.0),
         "summary_metrics": analysis["summary_metrics"],
         "fault_flags": analysis["fault_flags"],
+        "trained_model_prediction": analysis.get("trained_model_prediction"),
         "readings": analysis["telemetry_stream"]
     }

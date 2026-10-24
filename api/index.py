@@ -1,5 +1,5 @@
 """
-Vercel Serverless Function entrypoint for Nivaar AI Backend (FastAPI).
+Vercel Serverless Function entrypoint for Udyon Backend (FastAPI).
 Routes all /api/* requests to the FastAPI application instance.
 """
 import os
@@ -33,14 +33,14 @@ try:
 except Exception as e:
     logger.exception(f"Error loading FastAPI app in Vercel: {e}")
     from fastapi import FastAPI
-    app = FastAPI(title="Nivaar AI (Recovery Mode)")
+    app = FastAPI(title="Udyon (Recovery Mode)")
     
     @app.get("/api/health")
     @app.get("/health")
     def error_health():
         return {
             "status": "degraded",
-            "message": "Nivaar AI loaded in recovery mode",
+            "message": "Udyon loaded in recovery mode",
             "error": str(e)
         }
 

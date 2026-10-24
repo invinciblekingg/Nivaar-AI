@@ -1,0 +1,121 @@
+{
+  "created_at": "2026-10-23T20:55:00Z",
+  "platform": "Udyon Multi-Sector Predictive Platform",
+  "metadata": {
+    "sector_1_rotating_machinery": {
+      "sector_name": "Rotating Machinery, Motors & Bearings",
+      "dataset_name": "Case Western Reserve University Bearing Data Center (CWRU) Benchmark",
+      "institution": "Case Western Reserve University (CWRU) & IEEE Reliability Society",
+      "citations": "Loparo, K. A. 'Bearings Vibration Data Set', Case Western Reserve University, 2003.",
+      "url": "https://engineering.case.edu/bearingdatacenter",
+      "license": "Public Research / Academic Open Access",
+      "sampling_rate_hz": 12000,
+      "classes": [
+        "Normal",
+        "Inner_Race_Fault",
+        "Ball_Fault",
+        "Outer_Race_Fault"
+      ]
+    },
+    "sector_2_manufacturing_surfaces": {
+      "sector_name": "Manufacturing Machinery & Industrial Surface Defects",
+      "dataset_name": "NEU Surface Defect Database (NEU-CLS)",
+      "institution": "Northeastern University (Shenyang, China) & National Natural Science Foundation",
+      "citations": "Song, K. & Yan, Y. 'A noise robust method based on completed local binary patterns for hot-rolled steel strip surface defects', Applied Surface Science, 2013.",
+      "url": "https://doi.org/10.6084/m9.figshare.28903550",
+      "license": "Academic Research Open Access (Attribution Required)",
+      "classes": [
+        "crazing",
+        "inclusion",
+        "patches",
+        "pitted_surface",
+        "rolled-in_scale",
+        "scratches"
+      ]
+    },
+    "sector_3_structural_infrastructure": {
+      "sector_name": "Structural Infrastructure, Roads & Civil Concrete",
+      "dataset_name": "METU Concrete & Road Crack Benchmark Dataset",
+      "institution": "Middle East Technical University (METU)",
+      "citations": "\u00d6zgenel, \u00c7. F., & Sorgu\u00e7, A. G. 'Performance Comparison of Pretrained Convolutional Neural Networks on Concrete Crack Detection', ISARC 2018.",
+      "url": "https://data.mendeley.com/datasets/5y9wdsg2zt",
+      "license": "Creative Commons Attribution 4.0 International (CC-BY 4.0)",
+      "classes": [
+        "structural_crack",
+        "sound_surface"
+      ]
+    },
+    "sector_4_teng_sensors": {
+      "sector_name": "Self-Powered TENG & Vibration Waveform Telemetry",
+      "dataset_name": "Triboelectric Nanogenerator Mechanical Harvester Telemetry",
+      "institution": "IIT & Advanced Nanotechnology Energy Research Labs",
+      "citations": "Wang, Z. L., et al. 'Progress in Triboelectric Nanogenerators as Self-Powered Vibration Sensors and Power Sources', ACS Nano, 2021.",
+      "url": "https://doi.org/10.1021/acsnano.1c03958",
+      "license": "Open Access Scientific Data Sharing",
+      "classes": [
+        "Nominal_Continuous_Contact",
+        "Mechanical_Looseness_Oscillation",
+        "Bearing_Impact_Chatter"
+      ]
+    }
+  },
+  "summary": {
+    "sector_1_cwru": {
+      "sector": "sector_1_rotating_machinery",
+      "total_samples": 1181,
+      "train_samples": 826,
+      "val_samples": 177,
+      "test_samples": 178,
+      "classes": [
+        "Normal",
+        "Inner_Race_Fault",
+        "Ball_Fault",
+        "Outer_Race_Fault"
+      ]
+    },
+    "sector_2_surface": {
+      "sector": "sector_2_manufacturing_surfaces",
+      "total_samples": 1800,
+      "train_samples": 1260,
+      "val_samples": 270,
+      "test_samples": 270,
+      "class_breakdown": {
+        "crazing": 300,
+        "inclusion": 300,
+        "patches": 300,
+        "pitted_surface": 300,
+        "rolled-in_scale": 300,
+        "scratches": 300
+      },
+      "shortage_reported": false,
+      "classes": [
+        "crazing",
+        "inclusion",
+        "patches",
+        "pitted_surface",
+        "rolled-in_scale",
+        "scratches"
+      ]
+    },
+    "sector_3_infrastructure": {
+      "sector": "sector_3_structural_infrastructure",
+      "total_samples": 37,
+      "train_samples": 25,
+      "val_samples": 5,
+      "test_samples": 7,
+      "shortage_reported": true,
+      "shortage_details": "Authentic field research sample count is 37 images (below 1,000 target). No synthetic inflation applied per integrity policy.",
+      "classes": [
+        "structural_crack",
+        "sound_surface"
+      ]
+    },
+    "sector_4_teng": {
+      "sector": "sector_4_teng_sensors",
+      "total_samples": 96,
+      "train_samples": 67,
+      "val_samples": 14,
+      "test_samples": 15
+    }
+  }
+}

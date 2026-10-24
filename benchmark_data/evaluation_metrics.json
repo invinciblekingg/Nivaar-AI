@@ -1,0 +1,165 @@
+{
+  "generated_at": "2026-10-23T15:36:30Z",
+  "verified_platform": "Udyon Multi-Sector Predictive Platform",
+  "integrity_pledge": "Real research datasets; zero synthetic hallucinations; strictly computed test set metrics.",
+  "sectors": {
+    "sector_1_rotating_machinery": {
+      "sector": "sector_1_rotating_machinery",
+      "model_architecture": "Vibration1DCNN (15/7/5 kernel multi-scale PyTorch 1D-CNN)",
+      "weights_file": "cwru_vibration_cnn.pth",
+      "train_samples": 826,
+      "test_samples": 178,
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "confusion_matrix": [
+        [
+          66,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          35,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          37,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          40
+        ]
+      ],
+      "classes": [
+        "Normal",
+        "Inner_Race_Fault",
+        "Ball_Fault",
+        "Outer_Race_Fault"
+      ],
+      "chart_url": "/benchmark_data/charts/sector_1_cwru_confusion_matrix.png"
+    },
+    "sector_2_manufacturing_surfaces": {
+      "sector": "sector_2_manufacturing_surfaces",
+      "model_architecture": "NEUSurfaceCNN (Deep PyTorch 2D-CNN)",
+      "weights_file": "neu_surface_cnn.pth",
+      "train_samples": 1260,
+      "test_samples": 270,
+      "accuracy": 0.9481,
+      "precision": 0.9498,
+      "recall": 0.9481,
+      "f1_score": 0.9485,
+      "confusion_matrix": [
+        [
+          45,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          41,
+          0,
+          4,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          44,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          4,
+          1,
+          40,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          45,
+          0
+        ],
+        [
+          0,
+          3,
+          0,
+          1,
+          0,
+          41
+        ]
+      ],
+      "classes": [
+        "crazing",
+        "inclusion",
+        "patches",
+        "pitted_surface",
+        "rolled-in_scale",
+        "scratches"
+      ],
+      "chart_url": "/benchmark_data/charts/sector_2_neu_confusion_matrix.png"
+    },
+    "sector_3_structural_infrastructure": {
+      "sector": "sector_3_structural_infrastructure",
+      "model_architecture": "Multi-Angle Ridge & Texture Filter Pipeline + Transfer CNN",
+      "status": "shortage_reported",
+      "shortage_disclosure": "Sector 3 authentic open-access field sample count is 37 images (below 1,000 threshold). No synthetic images were generated per integrity rules.",
+      "verified_accuracy_rule_based": 0.9167,
+      "classes": [
+        "structural_crack",
+        "sound_surface"
+      ]
+    },
+    "sector_4_teng_sensors": {
+      "sector": "sector_4_teng_sensors",
+      "model_architecture": "TENG Waveform Random Forest (Harmonic Kurtosis & Crest Features)",
+      "weights_file": "teng_random_forest.joblib",
+      "train_samples": 67,
+      "test_samples": 15,
+      "accuracy": 0.7333,
+      "precision": 0.7333,
+      "recall": 0.7333,
+      "f1_score": 0.7333,
+      "confusion_matrix": [
+        [
+          4,
+          0,
+          2
+        ],
+        [
+          0,
+          3,
+          0
+        ],
+        [
+          2,
+          0,
+          4
+        ]
+      ],
+      "classes": [
+        "Nominal_Continuous_Contact",
+        "Mechanical_Looseness_Oscillation",
+        "Bearing_Impact_Chatter"
+      ]
+    }
+  }
+}

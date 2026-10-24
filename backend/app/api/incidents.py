@@ -6,6 +6,7 @@ from datetime import datetime
 from backend.app.database import get_db
 from backend.app.models import Incident, Machine
 from backend.app.schemas import IncidentCreate, IncidentUpdate, IncidentResponse
+from backend.app.supabase_client import sync_record_to_supabase
 
 router = APIRouter(prefix="/incidents", tags=["Disruption Response Center"])
 
@@ -68,6 +69,23 @@ def create_incident(data: IncidentCreate, db: Session = Depends(get_db)):
     db.add(incident)
     db.commit()
     db.refresh(incident)
+
+    try:
+        sync_record_to_supabase("incidents", {
+            "id": incident.id,
+            "machine_id": incident.machine_id,
+            "title": incident.title,
+            "operational_impact": incident.operational_impact,
+            "severity": incident.severity,
+            "status": incident.status,
+            "timeline": incident.timeline or [],
+            "recommended_inspections": incident.recommended_inspections or [],
+            "resolution_notes": incident.resolution_notes,
+            "created_at": incident.created_at
+        })
+    except Exception:
+        pass
+
     return incident
 
 @router.put("/{incident_id}")
@@ -100,4 +118,21 @@ def update_incident(incident_id: str, data: IncidentUpdate, db: Session = Depend
     incident.timeline = tl
     db.commit()
     db.refresh(incident)
+
+    try:
+        sync_record_to_supabase("incidents", {
+            "id": incident.id,
+            "machine_id": incident.machine_id,
+            "title": incident.title,
+            "operational_impact": incident.operational_impact,
+            "severity": incident.severity,
+            "status": incident.status,
+            "timeline": incident.timeline or [],
+            "recommended_inspections": incident.recommended_inspections or [],
+            "resolution_notes": incident.resolution_notes,
+            "resolved_at": incident.resolved_at
+        })
+    except Exception:
+        pass
+
     return incident

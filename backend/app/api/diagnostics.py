@@ -16,8 +16,16 @@ from backend.app.schemas import (
 )
 from workers.distributed_engine import fleet_supervisor
 from workers.tasks import execute_job_analysis
+from backend.app.supabase_client import (
+    upload_file_to_supabase, sync_record_to_supabase, test_supabase_connection
+)
 
 router = APIRouter(prefix="/diagnostics", tags=["Diagnostics"])
+
+@router.get("/supabase-status")
+def get_supabase_status():
+    """Returns real-time connectivity status for Supabase database and storage."""
+    return test_supabase_connection()
 
 @router.get("/sample-datasets")
 def get_sample_datasets():
@@ -113,6 +121,32 @@ async def upload_csv(
         db.add(dataset)
         db.commit()
         db.refresh(dataset)
+
+        # Upload CSV to Supabase Storage bucket and sync record
+        try:
+            with open(target_path, "rb") as f_data:
+                file_bytes = f_data.read()
+            storage_url = upload_file_to_supabase(
+                bucket_name=settings.SUPABASE_BUCKET_DATASETS,
+                remote_path=f"telemetry/{file_id}",
+                file_bytes=file_bytes,
+                content_type="text/csv"
+            )
+            sync_record_to_supabase("uploaded_datasets", {
+                "id": dataset.id,
+                "machine_id": machine_id,
+                "filename": file.filename,
+                "file_path": str(target_path),
+                "storage_url": storage_url,
+                "row_count": len(df),
+                "sensor_columns": sensor_cols,
+                "is_synthetic": False,
+                "provenance": "User Uploaded Real Telemetry",
+                "created_at": dataset.created_at
+            })
+        except Exception:
+            pass
+
         return dataset
     except Exception as e:
         if os.path.exists(target_path):

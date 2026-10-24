@@ -5,7 +5,7 @@ import subprocess
 def main():
     port = os.getenv("PORT", "10000")
     print("=" * 60)
-    print(f"  NIVAAR AI PLATFORM — RENDER WEB SERVICE")
+    print(f"  UDYON PLATFORM — RENDER WEB SERVICE")
     print(f"  Binding to 0.0.0.0:{port}")
     print("=" * 60)
 

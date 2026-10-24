@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: nivaar-ai
+    name: udyon
     runtime: python
     buildCommand: bash build.sh
     startCommand: python run_render.py

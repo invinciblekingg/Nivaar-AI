@@ -6,6 +6,7 @@ from datetime import datetime
 from backend.app.database import get_db
 from backend.app.models import Machine, SensorReading, Anomaly, Alert
 from backend.app.schemas import MachineCreate, MachineUpdate, MachineResponse
+from backend.app.supabase_client import sync_record_to_supabase, get_supabase_client
 
 router = APIRouter(prefix="/machines", tags=["Machines"])
 
@@ -66,6 +67,25 @@ def create_machine(data: MachineCreate, db: Session = Depends(get_db)):
     db.add(machine)
     db.commit()
     db.refresh(machine)
+
+    # Sync to Supabase
+    try:
+        sync_record_to_supabase("machines", {
+            "id": machine.id,
+            "name": machine.name,
+            "category": machine.category,
+            "asset_tag": machine.asset_tag,
+            "location_label": machine.location_label,
+            "status": machine.status,
+            "health_index": machine.health_index,
+            "profile_config": machine.profile_config or {},
+            "is_monitored": machine.is_monitored,
+            "created_at": machine.created_at,
+            "updated_at": machine.updated_at
+        })
+    except Exception:
+        pass
+
     return machine
 
 @router.put("/{machine_id}", response_model=MachineResponse)
@@ -81,6 +101,24 @@ def update_machine(machine_id: str, data: MachineUpdate, db: Session = Depends(g
     machine.updated_at = datetime.utcnow()
     db.commit()
     db.refresh(machine)
+
+    # Sync to Supabase
+    try:
+        sync_record_to_supabase("machines", {
+            "id": machine.id,
+            "name": machine.name,
+            "category": machine.category,
+            "asset_tag": machine.asset_tag,
+            "location_label": machine.location_label,
+            "status": machine.status,
+            "health_index": machine.health_index,
+            "profile_config": machine.profile_config or {},
+            "is_monitored": machine.is_monitored,
+            "updated_at": machine.updated_at
+        })
+    except Exception:
+        pass
+
     return machine
 
 @router.delete("/{machine_id}")
@@ -91,4 +129,13 @@ def delete_machine(machine_id: str, db: Session = Depends(get_db)):
     
     db.delete(machine)
     db.commit()
+
+    # Sync deletion to Supabase
+    try:
+        client = get_supabase_client()
+        if client:
+            client.table("machines").delete().eq("id", machine_id).execute()
+    except Exception:
+        pass
+
     return {"status": "success", "message": f"Machine {machine.name} deleted."}

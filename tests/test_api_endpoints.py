@@ -8,7 +8,7 @@ def test_health_check_endpoint():
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "healthy"
-        assert data["service"] in ["Nivaar AI", "MachineGuard AI"]
+        assert data["service"] in ["Udyon", "Udyon AI", "Nivaar AI", "MachineGuard AI"]
 
 def test_get_machines_endpoint():
     with TestClient(app) as client:

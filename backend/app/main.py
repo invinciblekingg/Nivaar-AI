@@ -23,6 +23,7 @@ from backend.app.api.reports import router as reports_router
 from backend.app.api.demo import router as demo_router
 from backend.app.api.teng import router as teng_router
 from backend.app.api.vision import router as vision_router
+from backend.app.api.alerts import router as alerts_router
 from backend.app.api.symbiosis import router as symbiosis_router
 from backend.app.api.symbiosis_marketplace import router as symbiosis_marketplace_router
 
@@ -33,24 +34,24 @@ logger = logging.getLogger("machineguard.main")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Ensure tables exist, seed demo datasets, initialize worker fleet
-    logger.info("Initializing Nivaar AI Platform...")
+    logger.info("Initializing Udyon Platform...")
     try:
         Base.metadata.create_all(bind=engine)
         seed_database()
         from backend.app.config import IS_VERCEL
         if not IS_VERCEL:
             fleet_supervisor.initialize_fleet()
-        logger.info("Nivaar AI Engine online.")
+        logger.info("Udyon Engine online.")
     except Exception as e:
         logger.warning(f"Startup initialization notice: {e}")
     yield
     # Shutdown
-    logger.info("Shutting down Nivaar AI services...")
+    logger.info("Shutting down Udyon services...")
 
 app = FastAPI(
-    title="Nivaar AI",
+    title="Udyon",
     version=settings.VERSION,
-    description="Nivaar AI: Intelligent Distributed Predictive Maintenance Platform",
+    description="Udyon: Intelligent Distributed Predictive Maintenance Platform",
     lifespan=lifespan,
     docs_url="/docs",
     openapi_url="/openapi.json"
@@ -85,7 +86,7 @@ ALL_ROUTERS = [
     machines_router, telemetry_router, diagnostics_router,
     distributed_router, maintenance_router, incidents_router,
     reports_router, demo_router, teng_router, vision_router,
-    symbiosis_router, symbiosis_marketplace_router
+    symbiosis_router, symbiosis_marketplace_router, alerts_router
 ]
 for r in ALL_ROUTERS:
     app.include_router(r, prefix=settings.API_PREFIX)

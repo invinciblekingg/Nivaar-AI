@@ -3,7 +3,7 @@
 set -e
 
 echo "============================================="
-echo "   NIVAAR AI — PRODUCTION RENDER BUILD"
+echo "   UDYON — PRODUCTION RENDER BUILD"
 echo "============================================="
 
 # 1. Python dependencies

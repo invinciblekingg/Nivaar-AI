@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, HTTPException, Query, Body
 from pydantic import BaseModel
+from backend.app.supabase_client import sync_record_to_supabase, fetch_records_from_supabase
 
 router = APIRouter(prefix="/symbiosis/marketplace", tags=["Symbiosis.AI -- Industrial Waste Marketplace & Synergy Engine"])
 
@@ -115,9 +116,9 @@ def calculate_match_score(producer: Dict[str, Any], consumer: Dict[str, Any], di
 # Seed Data: Participating Industrial Plants & Facilities
 # --------------------------------------------------------------------------
 COMPANIES_DB: Dict[str, Dict[str, Any]] = {
-    "comp_nivaar": {
-        "id": "comp_nivaar",
-        "companyName": "Nivaar Precision Heavy Industries (Plant Alpha)",
+    "comp_udyon": {
+        "id": "comp_udyon",
+        "companyName": "Udyon Precision Heavy Industries (Plant Alpha)",
         "industryType": "Automotive & Heavy Mechanical Equipment",
         "city": "Chennai",
         "state": "Tamil Nadu",
@@ -295,6 +296,8 @@ COMPANIES_DB: Dict[str, Dict[str, Any]] = {
         ]
     }
 }
+# Backward compatibility alias
+COMPANIES_DB["comp_nivaar"] = COMPANIES_DB["comp_udyon"]
 
 # --------------------------------------------------------------------------
 # Seed Data: Active Marketplace Listings
@@ -303,8 +306,8 @@ LISTINGS_DB: List[Dict[str, Any]] = [
     {
         "id": "list_101",
         "title": "High-Grade Class F Fly Ash from Thermal Power Station",
-        "companyId": "comp_nivaar",
-        "companyName": "Nivaar Precision Heavy Industries",
+        "companyId": "comp_udyon",
+        "companyName": "Udyon Precision Heavy Industries",
         "city": "Chennai",
         "state": "Tamil Nadu",
         "coordinates": {"latitude": 13.0827, "longitude": 80.2707},
@@ -326,8 +329,8 @@ LISTINGS_DB: List[Dict[str, Any]] = [
     {
         "id": "list_102",
         "title": "Clean Precision Steel Stamping & Cutting Offcuts (0.8mm - 2.5mm)",
-        "companyId": "comp_nivaar",
-        "companyName": "Nivaar Precision Heavy Industries",
+        "companyId": "comp_udyon",
+        "companyName": "Udyon Precision Heavy Industries",
         "city": "Chennai",
         "state": "Tamil Nadu",
         "coordinates": {"latitude": 13.0827, "longitude": 80.2707},
@@ -473,8 +476,8 @@ INQUIRIES_DB: List[Dict[str, Any]] = [
         "materialTitle": "Clean Precision Steel Stamping Scrap (0.8mm)",
         "buyerCompanyId": "comp_techsteel",
         "buyerCompanyName": "TechSteel Smelting & Rolling Mills",
-        "sellerCompanyId": "comp_nivaar",
-        "sellerCompanyName": "Nivaar Precision Heavy Industries",
+        "sellerCompanyId": "comp_udyon",
+        "sellerCompanyName": "Udyon Precision Heavy Industries",
         "quantityRequested": 180,
         "unit": "Metric Tons",
         "offeredPrice": 33000,
@@ -489,8 +492,8 @@ INQUIRIES_DB: List[Dict[str, Any]] = [
         "materialTitle": "High-Grade Class F Fly Ash",
         "buyerCompanyId": "comp_bharatcement",
         "buyerCompanyName": "Bharat Ultratech Cement Corporation",
-        "sellerCompanyId": "comp_nivaar",
-        "sellerCompanyName": "Nivaar Precision Heavy Industries",
+        "sellerCompanyId": "comp_udyon",
+        "sellerCompanyName": "Udyon Precision Heavy Industries",
         "quantityRequested": 250,
         "unit": "Metric Tons",
         "offeredPrice": 1200,
@@ -503,8 +506,8 @@ INQUIRIES_DB: List[Dict[str, Any]] = [
         "id": "inq_503",
         "listingId": "list_105",
         "materialTitle": "Neutralized Synthetic Chemical Gypsum",
-        "buyerCompanyId": "comp_nivaar",
-        "buyerCompanyName": "Nivaar Precision Heavy Industries",
+        "buyerCompanyId": "comp_udyon",
+        "buyerCompanyName": "Udyon Precision Heavy Industries",
         "sellerCompanyId": "comp_greenchem",
         "sellerCompanyName": "Apex Green Chemicals & Fertilizers",
         "quantityRequested": 120,
@@ -522,8 +525,8 @@ INQUIRIES_DB: List[Dict[str, Any]] = [
 # --------------------------------------------------------------------------
 class CreateListingRequest(BaseModel):
     title: str
-    companyId: Optional[str] = "comp_nivaar"
-    companyName: Optional[str] = "Nivaar Precision Heavy Industries"
+    companyId: Optional[str] = "comp_udyon"
+    companyName: Optional[str] = "Udyon Precision Heavy Industries"
     city: Optional[str] = "Chennai"
     state: Optional[str] = "Tamil Nadu"
     type: str  # 'waste' or 'requirement'
@@ -539,8 +542,8 @@ class CreateListingRequest(BaseModel):
 
 class CreateInquiryRequest(BaseModel):
     listingId: str
-    buyerCompanyId: Optional[str] = "comp_nivaar"
-    buyerCompanyName: Optional[str] = "Nivaar Precision Heavy Industries"
+    buyerCompanyId: Optional[str] = "comp_udyon"
+    buyerCompanyName: Optional[str] = "Udyon Precision Heavy Industries"
     quantityRequested: float
     unit: str = "Metric Tons"
     offeredPrice: float
@@ -553,7 +556,7 @@ class CreateInquiryRequest(BaseModel):
 
 @router.get("/matches")
 def get_symbiotic_matches(
-    company_id: str = Query("comp_nivaar", description="Active facility ID to calculate circular synergies for"),
+    company_id: str = Query("comp_udyon", description="Active facility ID to calculate circular synergies for"),
     min_score: int = Query(60, description="Minimum compatibility match score (0-100)"),
     max_distance_km: int = Query(500, description="Maximum haulage distance in kilometers")
 ):
@@ -565,7 +568,7 @@ def get_symbiotic_matches(
     """
     my_company = COMPANIES_DB.get(company_id)
     if not my_company:
-        my_company = COMPANIES_DB["comp_nivaar"]
+        my_company = COMPANIES_DB["comp_udyon"]
 
     my_coords = my_company.get("coordinates", {"latitude": 13.0827, "longitude": 80.2707})
     my_lat = my_coords["latitude"]
@@ -693,7 +696,38 @@ def get_marketplace_materials(
     query: Optional[str] = Query(None, description="Search query string")
 ):
     """Lists active marketplace material listings with search & category filters."""
+    # Check Supabase for shared records from second app or live sync
+    supabase_listings = fetch_records_from_supabase("symbiosis_materials", limit=200)
+    existing_ids = {m["id"] for m in LISTINGS_DB}
+
     results = list(LISTINGS_DB)
+    if supabase_listings:
+        for sl in supabase_listings:
+            if sl["id"] not in existing_ids:
+                results.append({
+                    "id": sl["id"],
+                    "title": sl.get("title", ""),
+                    "companyId": sl.get("company_id", "comp_external"),
+                    "companyName": sl.get("company_name", "Partner Facility"),
+                    "city": sl.get("city", "Chennai"),
+                    "state": sl.get("state", "Tamil Nadu"),
+                    "coordinates": sl.get("coordinates") or {"latitude": 13.0827, "longitude": 80.2707},
+                    "type": sl.get("type", "waste"),
+                    "materialType": sl.get("material_type", ""),
+                    "category": sl.get("category", "General"),
+                    "description": sl.get("description", ""),
+                    "quantity": sl.get("quantity", 0),
+                    "unit": sl.get("unit", "MT"),
+                    "quality": sl.get("quality") or {},
+                    "hazardous": sl.get("hazardous", "non-hazardous"),
+                    "availability": sl.get("availability", "continuous"),
+                    "pricing": sl.get("pricing") or {},
+                    "verified": sl.get("verified", True),
+                    "views": sl.get("views", 1),
+                    "inquiries": sl.get("inquiries", 0),
+                    "createdAt": sl.get("created_at") or datetime.utcnow().isoformat()
+                })
+                existing_ids.add(sl["id"])
 
     if type and type != "all":
         results = [m for m in results if m.get("type") == type]
@@ -724,8 +758,8 @@ def create_marketplace_listing(payload: CreateListingRequest):
     listing_item = {
         "id": new_id,
         "title": payload.title,
-        "companyId": payload.companyId or "comp_nivaar",
-        "companyName": payload.companyName or "Nivaar Precision Heavy Industries",
+        "companyId": payload.companyId or "comp_udyon",
+        "companyName": payload.companyName or "Udyon Precision Heavy Industries",
         "city": payload.city or "Chennai",
         "state": payload.state or "Tamil Nadu",
         "coordinates": {"latitude": 13.0827, "longitude": 80.2707},
@@ -747,6 +781,31 @@ def create_marketplace_listing(payload: CreateListingRequest):
 
     LISTINGS_DB.insert(0, listing_item)
 
+    # Sync to Supabase table symbiosis_materials for single source of truth
+    try:
+        sync_record_to_supabase("symbiosis_materials", {
+            "id": listing_item["id"],
+            "title": listing_item["title"],
+            "company_id": listing_item["companyId"],
+            "company_name": listing_item["companyName"],
+            "type": listing_item["type"],
+            "material_type": listing_item["materialType"],
+            "category": listing_item["category"],
+            "description": listing_item["description"],
+            "quantity": float(listing_item["quantity"]),
+            "unit": listing_item["unit"],
+            "quality": listing_item["quality"],
+            "pricing": listing_item["pricing"],
+            "hazardous": listing_item["hazardous"],
+            "availability": listing_item["availability"],
+            "verified": listing_item["verified"],
+            "views": listing_item["views"],
+            "inquiries": listing_item["inquiries"],
+            "created_at": listing_item["createdAt"]
+        })
+    except Exception:
+        pass
+
     return {
         "status": "success",
         "message": "Marketplace listing published successfully.",
@@ -754,7 +813,7 @@ def create_marketplace_listing(payload: CreateListingRequest):
     }
 
 @router.get("/impact")
-def get_circular_impact_stats(company_id: str = Query("comp_nivaar")):
+def get_circular_impact_stats(company_id: str = Query("comp_udyon")):
     """Returns circular economy & environmental ESG metrics (CO2, landfill, water, financial)."""
     return {
         "status": "success",
@@ -801,10 +860,35 @@ def get_connected_factories():
 @router.get("/inquiries")
 def get_trade_inquiries():
     """Returns active negotiation threads and byproduct deals."""
+    supabase_inquiries = fetch_records_from_supabase("symbiosis_inquiries", limit=100)
+    existing_ids = {i["id"] for i in INQUIRIES_DB}
+
+    results = list(INQUIRIES_DB)
+    if supabase_inquiries:
+        for si in supabase_inquiries:
+            if si["id"] not in existing_ids:
+                results.append({
+                    "id": si["id"],
+                    "listingId": si.get("listing_id"),
+                    "materialTitle": si.get("material_title", ""),
+                    "buyerCompanyId": si.get("buyer_company_id", "comp_external"),
+                    "buyerCompanyName": si.get("buyer_company_name", "Partner Facility"),
+                    "sellerCompanyId": si.get("seller_company_id", "comp_udyon"),
+                    "sellerCompanyName": si.get("seller_company_name", "Udyon Precision Heavy Industries"),
+                    "quantityRequested": si.get("quantity_requested", 0),
+                    "unit": si.get("unit", "MT"),
+                    "offeredPrice": si.get("offered_price"),
+                    "status": si.get("status", "PROPOSED"),
+                    "logisticsType": si.get("logistics_type", "Buyer Organized Freight"),
+                    "latestMessage": si.get("latest_message", ""),
+                    "updatedAt": si.get("created_at") or datetime.utcnow().isoformat()
+                })
+                existing_ids.add(si["id"])
+
     return {
         "status": "success",
-        "count": len(INQUIRIES_DB),
-        "inquiries": INQUIRIES_DB
+        "count": len(results),
+        "inquiries": results
     }
 
 @router.post("/inquiries")
@@ -818,8 +902,8 @@ def create_trade_inquiry(payload: CreateInquiryRequest):
         "id": f"inq_{len(INQUIRIES_DB) + 501}",
         "listingId": payload.listingId,
         "materialTitle": listing["title"],
-        "buyerCompanyId": payload.buyerCompanyId or "comp_nivaar",
-        "buyerCompanyName": payload.buyerCompanyName or "Nivaar Precision Heavy Industries",
+        "buyerCompanyId": payload.buyerCompanyId or "comp_udyon",
+        "buyerCompanyName": payload.buyerCompanyName or "Udyon Precision Heavy Industries",
         "sellerCompanyId": listing["companyId"],
         "sellerCompanyName": listing["companyName"],
         "quantityRequested": payload.quantityRequested,
@@ -833,6 +917,27 @@ def create_trade_inquiry(payload: CreateInquiryRequest):
 
     INQUIRIES_DB.insert(0, new_inq)
     listing["inquiries"] = listing.get("inquiries", 0) + 1
+
+    # Sync to Supabase table symbiosis_inquiries
+    try:
+        sync_record_to_supabase("symbiosis_inquiries", {
+            "id": new_inq["id"],
+            "listing_id": new_inq["listingId"],
+            "material_title": new_inq["materialTitle"],
+            "buyer_company_id": new_inq["buyerCompanyId"],
+            "buyer_company_name": new_inq["buyerCompanyName"],
+            "seller_company_id": new_inq["sellerCompanyId"],
+            "seller_company_name": new_inq["sellerCompanyName"],
+            "quantity_requested": float(new_inq["quantityRequested"]),
+            "unit": new_inq["unit"],
+            "offered_price": float(new_inq["offeredPrice"]) if new_inq["offeredPrice"] else None,
+            "status": new_inq["status"],
+            "logistics_type": new_inq["logisticsType"],
+            "latest_message": new_inq["latestMessage"],
+            "created_at": new_inq["updatedAt"]
+        })
+    except Exception:
+        pass
 
     return {
         "status": "success",

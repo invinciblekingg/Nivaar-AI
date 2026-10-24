@@ -1,7 +1,10 @@
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+load_dotenv(BASE_DIR / ".env")
+load_dotenv(BASE_DIR / "frontend" / ".env")
 
 # Detect Vercel / serverless / AWS Lambda environment
 IS_VERCEL = (
@@ -12,9 +15,10 @@ IS_VERCEL = (
 )
 
 class Settings:
-    PROJECT_NAME: str = "Nivaar AI"
+    PROJECT_NAME: str = "Udyon"
     VERSION: str = "1.0.0"
     API_PREFIX: str = "/api"
+    BASE_DIR: Path = BASE_DIR
     
     # Database
     if IS_VERCEL:
@@ -44,6 +48,40 @@ class Settings:
     # Security & CORS
     CORS_ORIGINS: list[str] = ["*"]
     SECRET_KEY: str = os.getenv("SECRET_KEY", "machineguard-super-secret-key-for-hackathon-2026")
+
+    # Supabase Configuration
+    _raw_supabase_url: str = os.getenv("SUPABASE_URL", os.getenv("NEXT_PUBLIC_SUPABASE_URL", os.getenv("VITE_SUPABASE_URL", "")))
+    SUPABASE_KEY: str = os.getenv("SUPABASE_KEY", os.getenv("SUPABASE_ANON_KEY", os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY", os.getenv("VITE_SUPABASE_ANON_KEY", ""))))
+    SUPABASE_SERVICE_ROLE_KEY: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
+
+    # Storage bucket names
+    SUPABASE_BUCKET_IMAGES: str = os.getenv("SUPABASE_BUCKET_IMAGES", "machine-images")
+    SUPABASE_BUCKET_DATASETS: str = os.getenv("SUPABASE_BUCKET_DATASETS", "telemetry-datasets")
+    SUPABASE_BUCKET_REPORTS: str = os.getenv("SUPABASE_BUCKET_REPORTS", "diagnostic-reports")
+
+    @property
+    def SUPABASE_URL(self) -> str:
+        url = self._raw_supabase_url.strip()
+        # If user passed a publishable key or reference instead of full URL, resolve to https://<ref>.supabase.co
+        if url.startswith("http://") or url.startswith("https://"):
+            return url.rstrip("/")
+        # Try decoding ref from anon key JWT if available
+        if self.SUPABASE_KEY and "." in self.SUPABASE_KEY:
+            try:
+                import base64, json
+                parts = self.SUPABASE_KEY.split(".")
+                if len(parts) >= 2:
+                    payload_b64 = parts[1] + "=" * (-len(parts[1]) % 4)
+                    payload = json.loads(base64.urlsafe_b64decode(payload_b64.encode()))
+                    ref = payload.get("ref")
+                    if ref:
+                        return f"https://{ref}.supabase.co"
+            except Exception:
+                pass
+        # Default fallback if known
+        if "riwhpkqyhinysukujzfe" in self.SUPABASE_KEY:
+            return "https://riwhpkqyhinysukujzfe.supabase.co"
+        return url
 
 settings = Settings()
 

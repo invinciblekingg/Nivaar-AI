@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { 
   LayoutDashboard, Server, Activity, Brain, 
   Layers, Wrench, Network, AlertOctagon,
-  Zap, Camera, Sparkles, X
+  Zap, Camera, Sparkles, X, FileCheck
 } from 'lucide-react';
 
 export type NavTab = 
@@ -17,6 +17,7 @@ export type NavTab =
   | 'incidents'
   | 'teng'
   | 'vision'
+  | 'report-studio'
   | 'symbiosis';
 
 interface SidebarProps {
@@ -37,9 +38,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed = false
 }) => {
   const multimodalItems = [
+    { id: 'vision' as NavTab, label: 'AI Vision Platform', icon: Camera, badge: 'Red CV Boxes', glow: 'text-red-400' },
     { id: 'teng' as NavTab, label: 'TENG Sensors', icon: Zap, badge: 'IoT Waveform', glow: 'text-[#FF5E1E]' },
-    { id: 'vision' as NavTab, label: 'AI Vision Platform', icon: Camera, badge: 'CV Defects', glow: 'text-[#FF8A3D]' },
-    { id: 'symbiosis' as NavTab, label: 'Symbiosis AI Fusion', icon: Sparkles, badge: 'Multimodal', glow: 'text-[#FFA15C]' },
+    { id: 'report-studio' as NavTab, label: 'Final Report Studio', icon: FileCheck, badge: 'Unified PDF', glow: 'text-rose-400' },
+    { id: 'symbiosis' as NavTab, label: 'Symbiosis AI Fusion', icon: Sparkles, badge: 'Multimodal', glow: 'text-[#FFA15C]', externalUrl: 'https://symbiosis-ai.onrender.com/' },
   ];
 
   const mainMenuItems = [
@@ -54,6 +56,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const handleTabClick = (tabId: NavTab) => {
+    if (tabId === 'symbiosis') {
+      window.location.href = 'https://symbiosis-ai.onrender.com/';
+      return;
+    }
     onSelectTab(tabId);
     if (onCloseMobile) {
       onCloseMobile();
@@ -80,6 +86,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {multimodalItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentTab === item.id;
+
+              if (item.externalUrl) {
+                return (
+                  <a
+                    key={item.id}
+                    href={item.externalUrl}
+                    title={collapsed ? item.label : undefined}
+                    className={`w-full flex items-center ${collapsed ? 'justify-center px-2' : 'justify-between px-3.5'} py-3 rounded-xl text-xs font-medium min-h-[44px] touch-target-min transition-all cursor-pointer text-slate-300 hover:text-white hover:bg-[#1E222B]/70 hover:shadow-[0_0_15px_rgba(255,161,92,0.15)]`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <Icon className="w-4 h-4 shrink-0 text-[#FFA15C]" />
+                      {!collapsed && <span>{item.label}</span>}
+                    </div>
+                    {!collapsed && item.badge && (
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded border font-mono bg-[#1C2028] text-slate-300 border-slate-700/60">
+                        {item.badge}
+                      </span>
+                    )}
+                  </a>
+                );
+              }
+
               return (
                 <button
                   key={item.id}
@@ -185,7 +213,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Safety Notice Footer */}
       {!collapsed && (
         <div className="p-4 border-t border-[rgba(255,255,255,0.08)] text-xs text-slate-400 space-y-1">
-          <p className="font-semibold text-slate-300">Nivaar AI Decision-Support</p>
+          <p className="font-semibold text-slate-300">Udyon Decision-Support</p>
           <p className="leading-relaxed text-[11px] text-slate-400">
             Advisory output only. Never executes automated machinery shutdowns without human inspection.
           </p>
@@ -221,8 +249,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {/* Header with Title and explicit Close button */}
             <div className="p-4 border-b border-[rgba(255,255,255,0.08)] flex items-center justify-between bg-[#1B1F27]">
               <div className="flex items-center space-x-2.5">
-                <img src="/nivaar_logo.jpg" alt="Logo" className="w-8 h-8 rounded-lg object-cover" />
-                <span className="font-bold text-sm tracking-wider text-white">NIVAAR <span className="text-[#FF5E1E]">AI</span></span>
+                <img src="/udyon_logo.jpg" alt="Logo" className="w-8 h-8 rounded-lg object-cover" />
+                <span className="font-bold text-sm tracking-wider text-white">UD<span className="text-[#FF5E1E]">YON</span></span>
               </div>
               <button
                 onClick={onCloseMobile}

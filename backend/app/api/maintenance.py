@@ -8,6 +8,7 @@ from backend.app.models import MaintenanceTask, Machine, Alert
 from backend.app.schemas import (
     MaintenanceTaskCreate, MaintenanceTaskUpdate, MaintenanceTaskResponse
 )
+from backend.app.supabase_client import sync_record_to_supabase
 
 router = APIRouter(prefix="/maintenance", tags=["Predictive Maintenance"])
 
@@ -74,6 +75,25 @@ def create_maintenance_task(data: MaintenanceTaskCreate, db: Session = Depends(g
     db.add(task)
     db.commit()
     db.refresh(task)
+
+    try:
+        sync_record_to_supabase("maintenance_tasks", {
+            "id": task.id,
+            "machine_id": task.machine_id,
+            "alert_id": task.alert_id,
+            "title": task.title,
+            "description": task.description,
+            "priority": task.priority,
+            "assignee": task.assignee,
+            "status": task.status,
+            "risk_score": task.risk_score,
+            "due_date": task.due_date,
+            "audit_trail": task.audit_trail or [],
+            "created_at": task.created_at
+        })
+    except Exception:
+        pass
+
     return task
 
 @router.put("/tasks/{task_id}")
@@ -108,4 +128,23 @@ def update_maintenance_task(task_id: str, data: MaintenanceTaskUpdate, db: Sessi
     task.audit_trail = trail
     db.commit()
     db.refresh(task)
+
+    try:
+        sync_record_to_supabase("maintenance_tasks", {
+            "id": task.id,
+            "machine_id": task.machine_id,
+            "alert_id": task.alert_id,
+            "title": task.title,
+            "description": task.description,
+            "priority": task.priority,
+            "assignee": task.assignee,
+            "status": task.status,
+            "risk_score": task.risk_score,
+            "due_date": task.due_date,
+            "audit_trail": task.audit_trail or [],
+            "completed_at": task.completed_at
+        })
+    except Exception:
+        pass
+
     return task

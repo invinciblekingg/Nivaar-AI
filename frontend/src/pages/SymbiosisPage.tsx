@@ -34,7 +34,7 @@ export const SymbiosisPage: React.FC<SymbiosisPageProps> = ({
 }) => {
   // Navigation & Active Sub-Tab
   const [activeTab, setActiveTab] = useState<SubTab>('matches');
-  const [activeCompanyId, setActiveCompanyId] = useState<string>('comp_nivaar');
+  const [activeCompanyId, setActiveCompanyId] = useState<string>('comp_udyon');
 
   // Predictive Diagnostics State
   const [evaluation, setEvaluation] = useState<SymbiosisEvaluation | null>(null);
@@ -208,7 +208,7 @@ export const SymbiosisPage: React.FC<SymbiosisPageProps> = ({
       const downloadUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = downloadUrl;
-      link.download = `NivaarAI_Multimodal_Report_${currentMachine.asset_tag}.pdf`;
+      link.download = `Udyon_Multimodal_Report_${currentMachine.asset_tag}.pdf`;
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -242,7 +242,7 @@ export const SymbiosisPage: React.FC<SymbiosisPageProps> = ({
       quantity: listing.quantity,
       offeredPrice: listing.pricing?.amount || 1000,
       logistics: 'Buyer Arranges Transport Logistics',
-      message: `Greetings from Nivaar Precision. We are interested in procuring ${listing.quantity} ${listing.unit} of ${listing.materialType}.`
+      message: `Greetings from Udyon Precision. We are interested in procuring ${listing.quantity} ${listing.unit} of ${listing.materialType}.`
     });
     setIsInquiryModalOpen(true);
   };
@@ -307,7 +307,7 @@ export const SymbiosisPage: React.FC<SymbiosisPageProps> = ({
                 onChange={(e) => setActiveCompanyId(e.target.value)}
                 className="bg-transparent text-xs text-white font-semibold focus:outline-none cursor-pointer"
               >
-                <option value="comp_nivaar" className="bg-[#1C2028] text-white">Nivaar Precision (Chennai Hub)</option>
+                <option value="comp_udyon" className="bg-[#1C2028] text-white">Udyon Precision (Chennai Hub)</option>
                 <option value="comp_techsteel" className="bg-[#1C2028] text-white">TechSteel Smelting (Salem)</option>
                 <option value="comp_bharatcement" className="bg-[#1C2028] text-white">Bharat Ultratech (Coimbatore)</option>
                 <option value="comp_ecopolymer" className="bg-[#1C2028] text-white">EcoPolymer Solutions (Hosur)</option>
@@ -650,7 +650,7 @@ export const SymbiosisPage: React.FC<SymbiosisPageProps> = ({
                           type: match.synergyType === 'outbound_byproduct' ? 'waste' : 'requirement',
                           materialType: match.producerMaterial.materialType,
                           category: match.producerMaterial.category,
-                          description: `Direct symbiotic match discovered between ${match.companyName} and Nivaar AI.`,
+                          description: `Direct symbiotic match discovered between ${match.companyName} and Udyon.`,
                           quantity: match.producerMaterial.quantity,
                           unit: match.producerMaterial.unit,
                           quality: { purity: 95 },
@@ -1081,14 +1081,14 @@ export const SymbiosisPage: React.FC<SymbiosisPageProps> = ({
                     <line x1="480" y1="70" x2="200" y2="210" stroke="#FF5E1E" strokeWidth="1.5" strokeDasharray="4 4" opacity="0.6" />
 
                     {/* Nodes */}
-                    {/* 1. Chennai (Nivaar AI Hub) */}
+                    {/* 1. Chennai (Udyon Hub) */}
                     <g 
                       className="cursor-pointer group"
-                      onClick={() => setSelectedFactory(factories.find(f => f.id === 'comp_nivaar') || null)}
+                      onClick={() => setSelectedFactory(factories.find(f => f.id === 'comp_udyon') || null)}
                     >
                       <circle cx="480" cy="70" r="14" fill="#FF5E1E" fillOpacity="0.25" className="animate-ping" />
                       <circle cx="480" cy="70" r="9" fill="#FF5E1E" stroke="#FFF" strokeWidth="2" />
-                      <text x="480" y="50" fill="#FFF" fontSize="11" fontWeight="bold" textAnchor="middle">Chennai Hub (Nivaar)</text>
+                      <text x="480" y="50" fill="#FFF" fontSize="11" fontWeight="bold" textAnchor="middle">Chennai Hub (Udyon)</text>
                     </g>
 
                     {/* 2. Ranipet (Apex Green Chemicals) */}
@@ -1308,7 +1308,7 @@ export const SymbiosisPage: React.FC<SymbiosisPageProps> = ({
       )}
 
       {/* =========================================================================
-          TAB 6: MULTIMODAL PREDICTIVE DIAGNOSTICS (Original Nivaar AI Fusion)
+          TAB 6: MULTIMODAL PREDICTIVE DIAGNOSTICS (Original Udyon Fusion)
          ========================================================================= */}
       {activeTab === 'fusion' && (
         <div className="space-y-6">

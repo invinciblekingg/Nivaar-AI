@@ -61,8 +61,14 @@ coverage.xml
 *.sqlite3
 *.db
 !demo_data/
-storage/uploads/
-storage/reports/*.tmp
+storage/uploads/*
+storage/annotated_images/*
+storage/reports/*
+!storage/uploads/.gitkeep
+!storage/annotated_images/.gitkeep
+!storage/reports/.gitkeep
+consolidated_test_report.pdf
+benchmark_data/raw_downloads/
 
 # Environment variables & secrets
 .env

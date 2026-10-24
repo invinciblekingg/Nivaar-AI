@@ -1,6 +1,6 @@
 import {
-  Machine, DashboardStats, FleetStatus, MaintenanceTask, 
-  Incident, AnalysisResult, TelemetryPoint, SampleDataset, AnalysisJob
+  Machine, DashboardStats, FleetStatus, MaintenanceTask,
+  Incident, AnalysisResult, TelemetryPoint, SampleDataset, AnalysisJob, Alert
 } from '../types';
 
 const API_BASE = '/api';
@@ -10,6 +10,18 @@ export const api = {
   async getDashboardStats(): Promise<DashboardStats> {
     const res = await fetch(`${API_BASE}/demo/stats`);
     if (!res.ok) throw new Error('Failed to fetch dashboard stats');
+    return res.json();
+  },
+
+  // Alerts
+  async getAlerts(machineId?: string, severity?: string, status?: string): Promise<Alert[]> {
+    const params = new URLSearchParams();
+    if (machineId) params.append('machine_id', machineId);
+    if (severity) params.append('severity', severity);
+    if (status) params.append('status', status);
+
+    const res = await fetch(`${API_BASE}/alerts?${params.toString()}`);
+    if (!res.ok) throw new Error('Failed to fetch alerts');
     return res.json();
   },
 
@@ -273,6 +285,12 @@ export const api = {
     return res.json();
   },
 
+  async getVerifiedSectors(): Promise<any> {
+    const res = await fetch(`${API_BASE}/vision/sectors`);
+    if (!res.ok) throw new Error('Failed to fetch verified sectors');
+    return res.json();
+  },
+
   async uploadImageInspection(machineId: string, file: File, componentName: string = 'Component', notes?: string): Promise<import('../types').ImageInspection> {
     const formData = new FormData();
     formData.append('machine_id', machineId);
@@ -341,7 +359,7 @@ export const api = {
   // Symbiosis.AI -- Circular Waste Exchange & Synergy Engine
   // ----------------------------------------------------
   async getSymbiosisMatches(
-    companyId: string = 'comp_nivaar',
+    companyId: string = 'comp_udyon',
     minScore: number = 60,
     maxDistanceKm: number = 500
   ): Promise<import('../types').SymbiosisMatchesResponse> {
@@ -389,7 +407,7 @@ export const api = {
   },
 
   async getSymbiosisImpact(
-    companyId: string = 'comp_nivaar'
+    companyId: string = 'comp_udyon'
   ): Promise<{ status: string; companyId: string; metrics: import('../types').SymbiosisImpactMetrics }> {
     const res = await fetch(`${API_BASE}/symbiosis/marketplace/impact?company_id=${companyId}`);
     if (!res.ok) throw new Error('Failed to fetch circular impact analytics');
@@ -429,6 +447,64 @@ export const api = {
       throw new Error(err.detail || 'Failed to submit trade inquiry');
     }
     return res.json();
+  },
+
+  // ----------------------------------------------------
+  // Final Report Studio & Inspection Verification
+  // ----------------------------------------------------
+  async updateInspectionDefects(
+    inspectionId: string,
+    defects: import('../types').ImageDefect[],
+    notes?: string,
+    reviewerName?: string,
+    visualSeverity?: string
+  ): Promise<{ status: string; message: string; inspection_id: string; defects: import('../types').ImageDefect[]; annotated_image_url?: string }> {
+    const res = await fetch(`${API_BASE}/vision/inspections/${inspectionId}/update-defects`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        defects,
+        notes,
+        reviewer_name: reviewerName,
+        visual_severity: visualSeverity
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Failed to update inspection defects');
+    }
+    return res.json();
+  },
+
+  async getSingleInspection(inspectionId: string): Promise<import('../types').ImageInspection> {
+    const res = await fetch(`${API_BASE}/vision/inspection/${inspectionId}`);
+    if (!res.ok) throw new Error('Failed to fetch inspection');
+    return res.json();
+  },
+
+  async getReportBundle(machineId: string, inspectionId?: string): Promise<import('../types').ReportBundle> {
+    const query = inspectionId ? `?inspection_id=${inspectionId}` : '';
+    const res = await fetch(`${API_BASE}/reports/bundle/${machineId}${query}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Failed to fetch report bundle');
+    }
+    return res.json();
+  },
+
+  async generateConsolidatedReport(
+    payload: import('../types').ConsolidatedReportPayload
+  ): Promise<Blob> {
+    const res = await fetch(`${API_BASE}/reports/consolidated-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || 'Failed to generate consolidated PDF report');
+    }
+    return res.blob();
   }
 };
 

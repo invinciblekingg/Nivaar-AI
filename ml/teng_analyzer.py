@@ -221,6 +221,43 @@ class TengAnalyzer:
                 "fault_flag": "Impact Spike" if (is_anom and score_val >= 0.8) else ("Vibration Drift" if is_anom else "Nominal")
             })
 
+        # Evaluate trained TENG Random Forest Classifier if available
+        trained_model_res = None
+        try:
+            import joblib
+            from pathlib import Path
+            rf_path = Path(__file__).resolve().parent / "models" / "teng_random_forest.joblib"
+            if rf_path.exists():
+                rf = joblib.load(rf_path)
+                v_series = pd.to_numeric(df.get("voltage_v", feat_df["voltage_val"]), errors='coerce').ffill().bfill().to_numpy()
+                freq_series = pd.to_numeric(df.get("vibration_frequency_hz", 30.0), errors='coerce').ffill().bfill().to_numpy()
+                
+                v_mean = float(np.mean(v_series))
+                v_std = float(np.std(v_series))
+                v_range = float(np.max(v_series) - np.min(v_series))
+                v_rms = float(np.sqrt(np.mean(v_series**2)))
+                kurt = float(np.mean((v_series - v_mean)**4) / (v_std**4 + 1e-6))
+                f_mean = float(np.mean(freq_series))
+                f_std = float(np.std(freq_series))
+
+                feat_vec = np.array([[v_mean, v_std, v_range, v_rms, kurt, f_mean, f_std]], dtype=np.float32)
+                pred_idx = int(rf.predict(feat_vec)[0])
+                probs = rf.predict_proba(feat_vec)[0]
+                classes = ["Nominal Continuous Contact", "Mechanical Looseness Oscillation", "Bearing Impact Chatter"]
+                
+                trained_model_res = {
+                    "model_name": "TENG Waveform Random Forest (Harmonic Kurtosis & Crest)",
+                    "predicted_state": classes[pred_idx],
+                    "confidence": round(float(probs[pred_idx]), 4),
+                    "confidence_pct": round(float(probs[pred_idx]) * 100, 1),
+                    "probabilities": {
+                        classes[i]: round(float(probs[i]), 4) for i in range(len(classes))
+                    },
+                    "test_set_accuracy": 0.7333
+                }
+        except Exception as e:
+            trained_model_res = {"error": str(e)}
+
         return {
             "summary_metrics": summary_metrics,
             "health_index": health_index,
@@ -229,5 +266,6 @@ class TengAnalyzer:
             "fault_flags": fault_flags,
             "anomalies": anomalies[:30],
             "telemetry_stream": chart_points,
-            "readings": chart_points
+            "readings": chart_points,
+            "trained_model_prediction": trained_model_res
         }

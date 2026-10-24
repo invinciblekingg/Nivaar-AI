@@ -66,7 +66,7 @@ class NumberedCanvas(canvas.Canvas):
 
         # Running Header (pages > 1)
         if self._pageNumber > 1:
-            self.drawString(36, 762, "Nivaar AI Platform -- Computer Vision Defect Segmentation Validation Report")
+            self.drawString(36, 762, "Udyon Platform -- Computer Vision Defect Segmentation Validation Report")
             self.setStrokeColor(colors.HexColor("#CBD5E1"))
             self.setLineWidth(0.5)
             self.line(36, 756, 576, 756)
@@ -75,7 +75,7 @@ class NumberedCanvas(canvas.Canvas):
         self.setStrokeColor(colors.HexColor("#CBD5E1"))
         self.setLineWidth(0.5)
         self.line(36, 36, 576, 36)
-        self.drawString(36, 26, "CONFIDENTIAL & PROPRIETARY -- NIVAAR AI RELIABILITY ENGINEERING LAB")
+        self.drawString(36, 26, "CONFIDENTIAL & PROPRIETARY -- UDYON RELIABILITY ENGINEERING LAB")
         page_str = f"Page {self._pageNumber} of {page_count}"
         self.drawRightString(576, 26, page_str)
         self.restoreState()
@@ -98,7 +98,7 @@ def run_evaluation():
     detector = ImageDefectDetector(output_dir=annotated_dir)
 
     print(f"\n=======================================================")
-    print(f"  NIVAAR AI COMPUTER VISION MODEL BENCHMARK SUITE")
+    print(f"  UDYON COMPUTER VISION MODEL BENCHMARK SUITE")
     print(f"  Evaluating {len(ground_truth)} Open-Source Industrial Defect Samples")
     print(f"=======================================================\n")
 
@@ -231,7 +231,7 @@ def run_evaluation():
     ax.set_yticklabels(labels, fontsize=9, fontweight='bold', color='#1E293B')
     ax.set_xlabel("Predicted Defect Modality", fontsize=10, fontweight='bold', labelpad=10)
     ax.set_ylabel("Ground Truth Modality", fontsize=10, fontweight='bold', labelpad=10)
-    ax.set_title("Nivaar AI Computer Vision Confusion Matrix", fontsize=12, fontweight='bold', pad=14, color='#0F172A')
+    ax.set_title("Udyon Computer Vision Confusion Matrix", fontsize=12, fontweight='bold', pad=14, color='#0F172A')
 
     for i in range(4):
         for j in range(4):
@@ -348,7 +348,7 @@ def run_evaluation():
     # BUILD REPORTLAB PUBLICATION-QUALITY PDF REPORT
     # =========================================================================
 
-    pdf_filename = "Nivaar_AI_Computer_Vision_Accuracy_Report.pdf"
+    pdf_filename = "Udyon_Computer_Vision_Accuracy_Report.pdf"
     pdf_out_path = os.path.join(reports_dir, pdf_filename)
     doc = SimpleDocTemplate(
         pdf_out_path,
@@ -451,7 +451,7 @@ def run_evaluation():
     story = []
 
     # ==================== PAGE 1: EXECUTIVE BRIEF & TECHNICAL DEEP DIVES ====================
-    story.append(Paragraph("NIVAAR AI RELIABILITY ENGINEERING LABS", ParagraphStyle('SuperH', fontName='Helvetica-Bold', fontSize=8.5, textColor=colors.HexColor('#FF5E1E'), leading=10)))
+    story.append(Paragraph("UDYON RELIABILITY ENGINEERING LABS", ParagraphStyle('SuperH', fontName='Helvetica-Bold', fontSize=8.5, textColor=colors.HexColor('#FF5E1E'), leading=10)))
     story.append(Spacer(1, 4))
     story.append(Paragraph("AI Computer Vision Platform: Empirical Accuracy & Performance Validation Report", title_style))
     story.append(Spacer(1, 3))
@@ -467,7 +467,7 @@ def run_evaluation():
     # Executive Summary Card Grid
     story.append(Paragraph("Executive Summary & Primary Key Performance Indicators (KPIs)", h1_style))
     story.append(Paragraph(
-        "This report delivers an empirical validation of the Nivaar AI Computer Vision platform across 24 standardized industrial component test images. The model was evaluated across three core physical damage modalities: structural surface cracks, severe pitting oxidation corrosion, and mechanical wear spalling flaking, alongside baseline pristine controls. All tests were executed deterministically on local edge hardware with zero external cloud API dependencies.",
+        "This report delivers an empirical validation of the Udyon Computer Vision platform across 24 standardized industrial component test images. The model was evaluated across three core physical damage modalities: structural surface cracks, severe pitting oxidation corrosion, and mechanical wear spalling flaking, alongside baseline pristine controls. All tests were executed deterministically on local edge hardware with zero external cloud API dependencies.",
         body_style
     ))
     story.append(Spacer(1, 8))
@@ -742,7 +742,7 @@ def run_evaluation():
         "<b>VERDICT: FULLY CERTIFIED FOR INDUSTRIAL PILOT DEPLOYMENT</b><br/>"
         "1. <b>Zero Cloud Cost:</b> 100% deterministic edge OpenCV computer vision eliminates all external per-call API fees and cloud latency bottlenecks.<br/>"
         "2. <b>High Noise Rejection:</b> Perfect specificity (100%) against machined surfaces and brushed grain ensures maintenance teams are never burdened with false alarm dispatches.<br/>"
-        "3. <b>Coupled Symbiosis Readiness:</b> Real-time bounding box metrics seamlessly feed into the Nivaar AI Multimodal Symbiosis engine to correlate physical cracks with TENG vibration telemetry.<br/>"
+        "3. <b>Coupled Symbiosis Readiness:</b> Real-time bounding box metrics seamlessly feed into the Udyon Multimodal Symbiosis engine to correlate physical cracks with TENG vibration telemetry.<br/>"
         "4. <b>Actionable Dispatch Integration:</b> Direct 1-click hooks trigger immediate maintenance tickets and incident command escalation for mission-critical structural compromises.",
         body_style
     ))

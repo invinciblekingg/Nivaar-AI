@@ -11,6 +11,7 @@ from backend.app.models import (
     Machine, TengDataset, ImageInspection, SymbiosisEvaluation,
     Alert, MaintenanceTask
 )
+from backend.app.supabase_client import sync_record_to_supabase
 from ml.teng_analyzer import TengAnalyzer
 from ml.symbiosis_engine import SymbiosisMultimodalFusion
 
@@ -126,6 +127,36 @@ def evaluate_multimodal_fusion(machine_id: str, db: Session = Depends(get_db)):
 
     db.commit()
     db.refresh(symbiosis_eval)
+
+    # Sync to Supabase table symbiosis_evaluations and machines
+    try:
+        sync_record_to_supabase("symbiosis_evaluations", {
+            "id": symbiosis_eval.id,
+            "machine_id": machine.id,
+            "teng_dataset_id": teng_ds.id if teng_ds else None,
+            "image_inspection_id": image_insp.id if image_insp else None,
+            "composite_health_index": fusion_output["composite_health_index"],
+            "overall_severity": fusion_output["overall_severity"],
+            "primary_fault_cause": fusion_output["primary_fault_cause"],
+            "confidence_score": fusion_output["confidence_score"],
+            "attribution_breakdown": fusion_output["attribution_breakdown"],
+            "cross_modal_correlations": fusion_output["cross_modal_correlations"],
+            "recommended_actions": fusion_output["recommended_actions"],
+            "created_at": symbiosis_eval.created_at
+        })
+        sync_record_to_supabase("machines", {
+            "id": machine.id,
+            "name": machine.name,
+            "category": machine.category,
+            "asset_tag": machine.asset_tag,
+            "location_label": machine.location_label,
+            "status": machine.status,
+            "health_index": machine.health_index,
+            "is_monitored": machine.is_monitored,
+            "last_analyzed_at": datetime.utcnow()
+        })
+    except Exception:
+        pass
 
     return {
         "status": "success",

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Zap, UploadCloud, Activity, AlertTriangle, CheckCircle2, 
   RefreshCw, TrendingUp, Cpu, Gauge, Radio, FileText, ChevronRight,
-  ShieldCheck, BarChart3, Database
+  ShieldCheck, BarChart3, Database, Box, Layers, Sparkles
 } from 'lucide-react';
 import { 
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, 
@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import { Machine, TengReading, TengSummaryMetrics, TengBenchmark, TengTelemetryResponse } from '../types';
 import { api } from '../services/api';
+import { Teng3DModelViewer } from '../components/Teng3DModelViewer';
 
 interface TengMonitoringPageProps {
   machines: Machine[];
@@ -27,7 +28,7 @@ export const TengMonitoringPage: React.FC<TengMonitoringPageProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [uploading, setUploading] = useState<boolean>(false);
   const [evaluatingBenchmark, setEvaluatingBenchmark] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'realtime' | 'benchmarks' | 'upload'>('realtime');
+  const [activeTab, setActiveTab] = useState<'3d_model' | 'realtime' | 'benchmarks' | 'upload'>('3d_model');
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [timeWindow, setTimeWindow] = useState<number>(60);
@@ -280,36 +281,51 @@ export const TengMonitoringPage: React.FC<TengMonitoringPageProps> = ({
       )}
 
       {/* Navigation Tabs with Industrial Orange Active Border */}
-      <div className="flex border-b border-slate-800 space-x-2">
+      <div className="flex border-b border-slate-800 space-x-2 overflow-x-auto">
+        <button
+          id="teng-tab-3d-model"
+          onClick={() => setActiveTab('3d_model')}
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all shrink-0 ${
+            activeTab === '3d_model'
+              ? 'bg-[#1C2028] text-[#FF5E1E] border-b-2 border-[#FF5E1E] font-bold shadow-lg'
+              : 'text-slate-400 hover:text-slate-200 hover:bg-[#161920]'
+          }`}
+        >
+          <Box className="w-3.5 h-3.5 text-[#FF5E1E]" />
+          <span>3D TENG Digital Twin</span>
+        </button>
         <button
           onClick={() => setActiveTab('realtime')}
-          className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all ${
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all shrink-0 ${
             activeTab === 'realtime'
               ? 'bg-[#1C2028] text-[#FF5E1E] border-b-2 border-[#FF5E1E] font-bold'
               : 'text-slate-400 hover:text-slate-200 hover:bg-[#161920]'
           }`}
         >
-          Real-Time Waveform & Spectra
+          <Activity className="w-3.5 h-3.5 text-[#FF7A00]" />
+          <span>Real-Time Waveforms & Spectra</span>
         </button>
         <button
           onClick={() => setActiveTab('benchmarks')}
-          className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all ${
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all shrink-0 ${
             activeTab === 'benchmarks'
               ? 'bg-[#1C2028] text-[#FF5E1E] border-b-2 border-[#FF5E1E] font-bold'
               : 'text-slate-400 hover:text-slate-200 hover:bg-[#161920]'
           }`}
         >
-          Preset Vibration Benchmarks ({benchmarks.length})
+          <Database className="w-3.5 h-3.5 text-amber-400" />
+          <span>Preset Vibration Benchmarks ({benchmarks.length})</span>
         </button>
         <button
           onClick={() => setActiveTab('upload')}
-          className={`px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all ${
+          className={`flex items-center space-x-2 px-4 py-2.5 text-xs font-semibold rounded-t-lg transition-all shrink-0 ${
             activeTab === 'upload'
               ? 'bg-[#1C2028] text-[#FF5E1E] border-b-2 border-[#FF5E1E] font-bold'
               : 'text-slate-400 hover:text-slate-200 hover:bg-[#161920]'
           }`}
         >
-          Upload TENG Sensor CSV
+          <UploadCloud className="w-3.5 h-3.5 text-slate-300" />
+          <span>Upload TENG Sensor CSV</span>
         </button>
       </div>
 
@@ -324,6 +340,128 @@ export const TengMonitoringPage: React.FC<TengMonitoringPageProps> = ({
           >
             ×
           </button>
+        </div>
+      )}
+
+      {/* Tab 0: Interactive 3D Digital Twin Sensor Model */}
+      {activeTab === '3d_model' && (
+        <div className="space-y-6">
+          {/* Main 3D Model Card */}
+          <div className="p-5 rounded-2xl bg-[#161920]/80 backdrop-blur-xl border border-[rgba(255,255,255,0.08)] shadow-2xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center space-x-2">
+                  <Box className="w-5 h-5 text-[#FF5E1E]" />
+                  <span>TENG Triboelectric Sensor Unit — 3D Digital Twin</span>
+                  <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950/80 text-emerald-400 border border-emerald-800 font-semibold uppercase">
+                    Interactive
+                  </span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">
+                  High-fidelity Tripo3D digital twin of the self-powered triboelectric vibration harvester. Rotate 360°, zoom in to microscopic electrode layers, and observe real-time kinetic contact-separation simulation.
+                </p>
+              </div>
+
+              <div className="flex items-center space-x-2 shrink-0">
+                <button
+                  onClick={() => setActiveTab('realtime')}
+                  className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#FF5E1E]/15 hover:bg-[#FF5E1E] text-[#FF7A00] hover:text-white border border-[#FF5E1E]/40 transition-all shadow-sm"
+                >
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>View Full Waveforms</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* 3D Model Viewer Canvas */}
+            <Teng3DModelViewer 
+              height="560px" 
+              vibrationHz={summary.dominant_freq_hz} 
+              voltageV={summary.vpp} 
+            />
+
+            {/* Companion Live Telemetry & Physics Breakdown */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              {/* Telemetry Stream Preview */}
+              <div className="p-4 rounded-xl bg-[#12141C] border border-white/5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
+                    <Activity className="w-3.5 h-3.5 text-[#FF5E1E]" />
+                    <span>Live Voltage Waveform (Voc)</span>
+                  </span>
+                  <span className="font-mono text-xs text-[#FF7A00] font-bold">
+                    {summary.vpp.toFixed(2)} Vpp
+                  </span>
+                </div>
+                <div className="h-24 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={displayReadings.slice(-25)} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="miniVoltGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#FF5E1E" stopOpacity={0.4}/>
+                          <stop offset="95%" stopColor="#FF5E1E" stopOpacity={0.0}/>
+                        </linearGradient>
+                      </defs>
+                      <Area 
+                        type="monotone" 
+                        dataKey="voltage_v" 
+                        stroke="#FF5E1E" 
+                        strokeWidth={1.8} 
+                        fill="url(#miniVoltGrad)" 
+                        isAnimationActive={false}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex justify-between text-[10px] font-mono text-slate-500 pt-1">
+                  <span>Freq: {summary.dominant_freq_hz.toFixed(1)} Hz</span>
+                  <span>Qsc: {summary.mean_charge_nc.toFixed(2)} nC</span>
+                </div>
+              </div>
+
+              {/* Working Principle Card */}
+              <div className="p-4 rounded-xl bg-[#12141C] border border-white/5 space-y-2">
+                <div className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
+                  <Zap className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Triboelectric Energy Harvesting</span>
+                </div>
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  Operates via vertical contact-separation mode. As machinery vibrates, periodic micro-contact between dielectric polymer and copper electrode generates surface charge displacement, producing open-circuit voltage spikes without external batteries.
+                </p>
+                <div className="text-[10px] font-mono text-amber-400/90 pt-1 flex items-center space-x-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping" />
+                  <span>Self-Powered Kinetic IoT Telemetry</span>
+                </div>
+              </div>
+
+              {/* Material Composition Card */}
+              <div className="p-4 rounded-xl bg-[#12141C] border border-white/5 space-y-2">
+                <div className="text-xs font-semibold text-slate-300 flex items-center space-x-1.5">
+                  <Layers className="w-3.5 h-3.5 text-[#38bdf8]" />
+                  <span>Industrial Layer Architecture</span>
+                </div>
+                <ul className="text-[11px] text-slate-400 space-y-1">
+                  <li className="flex items-center justify-between">
+                    <span>Enclosure:</span>
+                    <strong className="text-slate-200 font-mono">Optical PMMA Acrylic</strong>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span>Electrode:</span>
+                    <strong className="text-slate-200 font-mono">35µm Copper Pattern</strong>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span>Dielectric:</span>
+                    <strong className="text-slate-200 font-mono">PTFE Nanostructure</strong>
+                  </li>
+                  <li className="flex items-center justify-between">
+                    <span>AI Model:</span>
+                    <strong className="text-[#FF7A00] font-mono">Isolation Forest</strong>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

@@ -1,7 +1,7 @@
 {
-  "name": "nivaar-ai",
+  "name": "udyon",
   "version": "1.0.0",
-  "description": "Nivaar AI — Intelligent Distributed Predictive Maintenance & Symbiosis Circular Exchange Platform",
+  "description": "Udyon — Intelligent Distributed Predictive Maintenance & Symbiosis Circular Exchange Platform",
   "private": true,
   "scripts": {
     "build": "cd frontend && npm install && npm run build",

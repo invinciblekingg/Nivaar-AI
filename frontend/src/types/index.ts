@@ -238,17 +238,60 @@ export interface TengTelemetryResponse {
 // AI Image Analysis Platform
 // ----------------------------------------------------
 export interface ImageDefect {
-  defect_type: 'crack' | 'corrosion' | 'wear_spalling' | 'loose_mount_gap';
+  id?: string;
+  defect_type: 'crack' | 'corrosion' | 'wear_spalling' | 'loose_mount_gap' | string;
   label: string;
+  type?: string;
   confidence: number;
   is_confirmed: boolean;
   bbox: [number, number, number, number]; // [x1, y1, x2, y2]
+  bbox_xywh?: [number, number, number, number];
+  normalized_bbox?: [number, number, number, number];
+  polygon?: Array<[number, number]>;
+  svg_path?: string;
+  has_segmentation_mask?: boolean;
   area_pct: number;
+  coverage_pct?: number;
+  area_pixels?: number;
   description: string;
   classification?: string;
-  severity?: 'CRITICAL' | 'SEVERE' | 'MODERATE' | 'LOW';
+  severity?: 'CRITICAL' | 'SEVERE' | 'MODERATE' | 'LOW' | string;
   physical_indicator?: string;
   recommendation?: string;
+}
+
+export interface DeepClassification {
+  available: boolean;
+  model_name?: string;
+  dataset_provenance?: string;
+  license?: string;
+  predicted_defect?: string;
+  predicted_label?: string;
+  confidence?: number;
+  confidence_pct?: number;
+  is_confirmed?: boolean;
+  classification_status?: 'CONFIRMED_OBSERVATION' | 'UNCERTAIN_PREDICTION';
+  uncertainty_score?: number;
+  normalized_entropy?: number;
+  class_probabilities?: Record<string, number>;
+  error?: string;
+}
+
+export interface DeepCrackClassification {
+  available: boolean;
+  model_name?: string;
+  dataset_provenance?: string;
+  predicted_class?: 'structural_crack' | 'sound_surface';
+  predicted_label?: string;
+  crack_probability?: number;
+  sound_probability?: number;
+  confidence?: number;
+  confidence_pct?: number;
+  is_confirmed?: boolean;
+  classification_status?: 'CONFIRMED_OBSERVATION' | 'UNCERTAIN_PREDICTION';
+  normalized_entropy?: number;
+  accuracy_tier?: string;
+  error?: string;
 }
 
 export interface ImageInspection {
@@ -261,6 +304,8 @@ export interface ImageInspection {
   defect_count: number;
   visual_condition_score: number;
   visual_severity: 'NEGLIGIBLE' | 'MODERATE' | 'SEVERE' | 'CRITICAL';
+  deep_classification?: DeepClassification;
+  deep_crack_classification?: DeepCrackClassification;
   notes?: string;
   created_at: string;
 }
@@ -270,6 +315,7 @@ export interface VisionSample {
   name: string;
   filename: string;
   component: string;
+  sector?: string;
   description: string;
   expected_defects: string[];
   expected_severity: string;
@@ -474,5 +520,64 @@ export interface CreateSymbiosisInquiryPayload {
   logisticsType?: string;
   initialMessage: string;
 }
+
+// ----------------------------------------------------
+// Final Report Studio & Consolidated Reports
+// ----------------------------------------------------
+export interface ReportBundle {
+  status: string;
+  machine: Machine;
+  selected_inspection?: ImageInspection & { defects: ImageDefect[] };
+  inspections_history: Array<{
+    id: string;
+    component_name: string;
+    defect_count: number;
+    confirmed_count: number;
+    visual_severity: string;
+    visual_condition_score: number;
+    created_at?: string;
+    filename: string;
+  }>;
+  teng_telemetry: {
+    dataset_id?: string;
+    filename: string;
+    metrics: Record<string, number>;
+    chart_samples: Array<{ time: number; voltage: number; frequency: number }>;
+    health_index: number;
+    fault_flags: string[];
+  };
+  symbiosis: {
+    id?: string;
+    composite_health_index: number;
+    overall_severity: string;
+    primary_fault_cause: string;
+    confidence_score: number;
+    attribution_breakdown: Record<string, number>;
+    cross_modal_correlations: Array<{ signal: string; visual: string; correlation: number }>;
+    recommended_actions: string[];
+  };
+  alerts: Alert[];
+  maintenance_tasks: MaintenanceTask[];
+  integrity_check: {
+    has_machine: boolean;
+    has_inspection: boolean;
+    has_teng: boolean;
+    has_symbiosis: boolean;
+    is_complete: boolean;
+    missing_streams: string[];
+    notes: string;
+  };
+}
+
+export interface ConsolidatedReportPayload {
+  machine_id: string;
+  inspection_id?: string;
+  reviewer_name?: string;
+  reviewer_title?: string;
+  signoff_status?: string;
+  executive_notes?: string;
+  priority_override?: string;
+}
+
 
 

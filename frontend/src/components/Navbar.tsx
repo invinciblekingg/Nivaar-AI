@@ -1,14 +1,14 @@
 import React from 'react';
 import { 
-  ShieldAlert, Activity, Cpu, Play, Download, Bell, 
+  ShieldAlert, Activity, Cpu, Download, Bell, 
   CheckCircle2, AlertTriangle, Layers, Flame, Menu, X
 } from 'lucide-react';
 import { DashboardStats } from '../types';
 
 interface NavbarProps {
   stats: DashboardStats | null;
-  onLaunchDemo: () => void;
-  isDemoRunning: boolean;
+  onLaunchDemo?: () => void;
+  isDemoRunning?: boolean;
   isMobileMenuOpen?: boolean;
   onToggleMobileMenu?: () => void;
 }
@@ -41,13 +41,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         )}
 
         <img 
-          src="/nivaar_logo.jpg" 
-          alt="Nivaar AI Logo" 
+          src="/udyon_logo.jpg" 
+          alt="Udyon Logo" 
           className="w-10 h-10 rounded-xl object-cover border border-[#FF5E1E]/40 shadow-[0_0_15px_rgba(255,94,30,0.4)] shrink-0"
         />
         <div>
           <div className="flex items-center space-x-2">
-            <span className="font-bold text-base sm:text-lg tracking-wider text-white">NIVAAR <span className="text-[#FF5E1E]">AI</span></span>
+            <span className="font-bold text-base sm:text-lg tracking-wider text-white">UD<span className="text-[#FF5E1E]">YON</span></span>
             <span className="text-[11px] uppercase font-semibold px-2 py-0.5 rounded bg-[#FF5E1E]/15 text-[#FF7A00] border border-[#FF5E1E]/30 tracking-widest font-mono hidden sm:inline-block">
               Multimodal AI & TENG
             </span>
@@ -75,22 +75,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span>{stats.critical_alerts} Critical Alerts</span>
           </div>
         )}
-
-        {/* Hackathon Demo Launcher Button with 44pt touch ergonomics */}
-        <button
-          onClick={onLaunchDemo}
-          disabled={isDemoRunning}
-          aria-label="Launch Hackathon Live Demonstration Workflow"
-          className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs tracking-wider uppercase transition-all duration-200 min-h-[40px] touch-target-min ${
-            isDemoRunning
-              ? 'bg-slate-700 text-slate-400 cursor-not-allowed'
-              : 'bg-gradient-to-r from-[#FF5E1E] to-[#FF7A00] text-[#0F1115] font-bold hover:shadow-[0_0_20px_rgba(255,94,30,0.5)] active:scale-[0.98]'
-          }`}
-        >
-          <Play className={`w-3.5 h-3.5 fill-current ${isDemoRunning ? 'animate-spin' : ''}`} />
-          <span className="hidden sm:inline">{isDemoRunning ? 'Orchestrating...' : 'Launch Hackathon Demo'}</span>
-          <span className="sm:hidden">{isDemoRunning ? 'Running...' : 'Demo'}</span>
-        </button>
       </div>
     </header>
   );

@@ -13,13 +13,19 @@ import { IncidentsPage } from './pages/IncidentsPage';
 import { TengMonitoringPage } from './pages/TengMonitoringPage';
 import { ImageAnalysisPage } from './pages/ImageAnalysisPage';
 import { SymbiosisPage } from './pages/SymbiosisPage';
+import { FinalReportStudioPage } from './pages/FinalReportStudioPage';
 
 import { api } from './services/api';
 import { DashboardStats, Machine, Alert } from './types';
+import { 
+  subscribeToMachines, subscribeToAlerts, 
+  subscribeToMaintenanceTasks, subscribeToIncidents 
+} from './services/supabase';
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<NavTab>('overview');
   const [selectedMachineId, setSelectedMachineId] = useState<string>('m-motor-104');
+  const [targetInspectionId, setTargetInspectionId] = useState<string | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [machines, setMachines] = useState<Machine[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
@@ -48,11 +54,13 @@ export function App() {
 
   const fetchGlobalData = async () => {
     try {
-      const [statsRes, machinesRes] = await Promise.all([
+      const [statsRes, machinesRes, alertsRes] = await Promise.all([
         api.getDashboardStats().catch(() => null),
-        api.getMachines().catch(() => [])
+        api.getMachines().catch(() => []),
+        api.getAlerts().catch(() => [])
       ]);
       if (statsRes) setStats(statsRes);
+      if (Array.isArray(alertsRes) && alertsRes.length > 0) setAlerts(alertsRes);
       if (machinesRes && machinesRes.length > 0) {
         setMachines(machinesRes);
         if (!selectedMachineId) {
@@ -68,6 +76,36 @@ export function App() {
     fetchGlobalData();
     const interval = setInterval(fetchGlobalData, 4000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Supabase Real-Time Channel Subscriptions
+  useEffect(() => {
+    const unsubMachines = subscribeToMachines((payload) => {
+      console.log('[Supabase Realtime] Machine state updated:', payload);
+      fetchGlobalData();
+    });
+
+    const unsubAlerts = subscribeToAlerts((payload) => {
+      console.log('[Supabase Realtime] New alert event:', payload);
+      fetchGlobalData();
+    });
+
+    const unsubTasks = subscribeToMaintenanceTasks((payload) => {
+      console.log('[Supabase Realtime] Maintenance task update:', payload);
+      fetchGlobalData();
+    });
+
+    const unsubIncidents = subscribeToIncidents((payload) => {
+      console.log('[Supabase Realtime] Incident event:', payload);
+      fetchGlobalData();
+    });
+
+    return () => {
+      unsubMachines();
+      unsubAlerts();
+      unsubTasks();
+      unsubIncidents();
+    };
   }, []);
 
   // WebSocket Live Connection
@@ -138,6 +176,10 @@ export function App() {
         <Sidebar
           currentTab={currentTab}
           onSelectTab={(tab) => {
+            if (tab === 'symbiosis') {
+              window.location.href = 'https://symbiosis-ai.onrender.com/';
+              return;
+            }
             setCurrentTab(tab);
             setMobileMenuOpen(false);
           }}
@@ -218,15 +260,35 @@ export function App() {
                 machines={machines}
                 selectedMachineId={selectedMachineId}
                 onSelectMachine={setSelectedMachineId}
+                onNavigateToReportStudio={(machineId, inspectionId) => {
+                  setSelectedMachineId(machineId);
+                  setTargetInspectionId(inspectionId);
+                  setCurrentTab('report-studio');
+                }}
+              />
+            )}
+
+            {currentTab === 'report-studio' && (
+              <FinalReportStudioPage
+                machines={machines}
+                selectedMachineId={selectedMachineId}
+                initialInspectionId={targetInspectionId || undefined}
+                onSelectMachine={setSelectedMachineId}
               />
             )}
 
             {currentTab === 'symbiosis' && (
-              <SymbiosisPage
-                machines={machines}
-                selectedMachineId={selectedMachineId}
-                onSelectMachine={setSelectedMachineId}
-              />
+              (() => {
+                if (typeof window !== 'undefined') {
+                  window.location.href = 'https://symbiosis-ai.onrender.com/';
+                }
+                return (
+                  <div className="flex flex-col items-center justify-center py-24 space-y-4">
+                    <div className="w-10 h-10 border-2 border-[#FF5E1E] border-t-transparent rounded-full animate-spin" />
+                    <p className="text-sm text-slate-300">Redirecting to Symbiosis AI...</p>
+                  </div>
+                );
+              })()
             )}
           </div>
         </main>
